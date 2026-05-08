@@ -72,8 +72,15 @@ public class Table {
      * @param nom
      * @return l 'attribut dont il ya le nom nom
      */
-    public Attribut getAttribut(String nom){
-        return null;
+    public Attribut getAttribut(String nom){//la je pene il sera mieux si en ceera uen exception pour dire si l'attrinbut exuste ou pas
+       
+            for( Attribut att :this.attributs){
+                if(nom == att.getNom()){
+
+                    return att;
+                }
+            }
+            return null;//ici en doit enlever 
     }
 
     /***
@@ -82,7 +89,8 @@ public class Table {
      * @return un boolean en indiquant si l attribut avec ce nom la existe ou pas 
      */
     public boolean attributExiste(String nom){
-        return false;
+        Attribut att= this.getAttribut(nom); // jai utiliser la methode implementer avant pour obtenir lobjet attr 
+        return this.attributs.contains(att);// dapres la java doc cette methode retourn true si existe false si non 
     }
 
     /***
@@ -90,8 +98,10 @@ public class Table {
      * @param nom
      * @return lindice de l'attribut possedent le nom nom
     */
-    public int indexAttribut(String nom){
-        return 0;
+    public int indexAttribut(String nom){//la encore il faut ajouter lexceprion ou bien throws car en utilise un methode qui est get attribut qui peut lever une exceprion 
+        Attribut att=this.getAttribut(nom);
+        int index= this.attributs.indexOf(att);//dapres la java doc (Returns the index of the first occurrence of the specified element in this list, or -1 if this list does not contain the elemen)
+        return index;
     }
 
         
