@@ -9,4 +9,4 @@ import fr.insarouen.iti.prog.sgbd.modele.AllTestsModele;
    AllTestsModele.class
 })
 
-public class Alltests {}
+public class AllTests {}
