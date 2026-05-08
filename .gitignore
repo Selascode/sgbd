@@ -1,0 +1,14 @@
+# Fichiers compilés Java
+classes/
+classestest/
+classestestNM/
+*.class
+
+# Documentation générée
+doc/
+
+# Fichiers système ou d'éditeurs (optionnel mais recommandé)
+.vscode/
+.idea/
+out/
+.DS_Store
