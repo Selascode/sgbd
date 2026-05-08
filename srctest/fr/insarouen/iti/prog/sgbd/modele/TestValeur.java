@@ -9,15 +9,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import fr.insarouen.iti.prog.sgbd.exceptions.ErreurTypesIncompatible;
 
-private ValeurInt vInt1;
-private ValeurInt vInt2;
-private ValeurInt vInt3;
-private ValeurVarchar vVC1;
-private ValeurVarchar vVC2;
-private ValeurVarchar vVC3;
 
 public class TestValeur {
 
+    private ValeurInt vInt1;
+    private ValeurInt vInt2;
+    private ValeurInt vInt3;
+    private ValeurVarchar vVC1;
+    private ValeurVarchar vVC2;
+    private ValeurVarchar vVC3;
     @Before
     public void avantTest() {
         // Test qui reprenent test_type.sql

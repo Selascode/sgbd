@@ -47,7 +47,7 @@ public class ValeurVarchar extends Valeur {
      */
     public int compareA(Valeur autre) throws ErreurTypesIncompatible {
         if (!(autre instanceof ValeurVarchar)) {
-            throw new ErreurTypesIncompatible(Type.VARCHAR, autre.getType());
+            throw new ErreurTypesIncompatible(String.format("Le type attendu : VAECHAR, type reçu : %s", autre.getType() == Type.INT ? "INT" : "SERIAL" ));
         }
         ValeurVarchar autreVarchar = (ValeurVarchar) autre;
         return this.valeur.compareTo(autreVarchar.getDonnee());
