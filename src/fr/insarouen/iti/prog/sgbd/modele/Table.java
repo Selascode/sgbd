@@ -38,18 +38,22 @@ public class Table {
      * @param t Tuple qui contient des valeur d'attribut
      */
     public void insererTuple(Tuple t){
-
+        this.tuples.add(t);
     }
 
 
 
     /***
      * 
-     * @param tuples
-     * @return retourne le nb tuple qui sonr supprimer 
+     * @param tuplesASupprimer
+     * @return retourne le nb tuple qui sont supprimer 
      */
-    public int supprimerTuples(List<Tuple> tuples){
-        return 0;
+    public int supprimerTuples(List<Tuple> tuplesASupprimer) {
+        int tailleAvant = this.tuples.size();
+        this.tuples.removeAll(tuplesASupprimer);
+        int tailleApres = this.tuples.size();
+        
+        return tailleAvant - tailleApres; // La différence nous donne le nombre de lignes supprimées
     }
 
     /**
@@ -58,7 +62,7 @@ public class Table {
      * 
      */
     public List<Tuple> getTuples(){
-        return null;
+        return this.tuples;
 
 
         
