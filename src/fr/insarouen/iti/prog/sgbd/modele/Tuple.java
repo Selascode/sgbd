@@ -3,6 +3,15 @@ package fr.insarouen.iti.prog.sgbd.modele;
 import fr.insarouen.iti.prog.sgbd.modele.*;
 import java.util.List;
 
+
+/**
+ * Représente un tuple (une ligne de données) dans une table.
+ * Un tuple est une collection ordonnée de valeurs correspondant aux attributs de la table.
+ * * @author Elakoum
+ * @version 1.0
+ */
+
+
 public class Tuple {
     private List<Valeur> values;
     public Tuple(List<Valeur> values){
