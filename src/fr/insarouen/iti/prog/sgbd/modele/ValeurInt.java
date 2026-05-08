@@ -60,6 +60,6 @@ public class ValeurInt extends Valeur {
      * @return {@code true} uniquement si {@code t} est {@link Type#INT}
      */
     public boolean estCompatible(Type t) {
-        return t == Type.INT && t == Type.SERIAL;
+        return t == Type.INT || t == Type.SERIAL;
     }
 }
