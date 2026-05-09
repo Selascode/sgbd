@@ -41,7 +41,7 @@ public class Tuple {
      * @return retourn la taille dun tuple
      */
     public int taille(){
-        return 0;
+        return this.values.size();
     }
 
 
