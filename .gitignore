@@ -1,13 +1,14 @@
-# Fichiers compilés Java
+# Dossier de build Maven (CRUCIAL)
+target/
+
+# Tes dossiers actuels
 classes/
 classestest/
 classestestNM/
 *.class
 
-# Documentation générée
+# Documentation et IDE
 doc/
-
-# Fichiers système ou d'éditeurs (optionnel mais recommandé)
 .vscode/
 .idea/
 out/
