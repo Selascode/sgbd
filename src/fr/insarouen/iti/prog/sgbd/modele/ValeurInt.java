@@ -62,4 +62,17 @@ public class ValeurInt extends Valeur {
     public boolean estCompatible(Type t) {
         return t == Type.INT || t == Type.SERIAL;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || !(obj instanceof ValeurInt)) return false;
+        ValeurInt other = (ValeurInt) obj;
+        return this.valeur == other.valeur;
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(this.valeur);
+    }
 }

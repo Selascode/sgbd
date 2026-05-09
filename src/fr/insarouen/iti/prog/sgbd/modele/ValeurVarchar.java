@@ -62,4 +62,17 @@ public class ValeurVarchar extends Valeur {
     public boolean estCompatible(Type t) {
         return t == Type.VARCHAR;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || !(obj instanceof ValeurVarchar)) return false;
+        ValeurVarchar other = (ValeurVarchar) obj;
+        return this.valeur.equals(other.valeur);
+    }
+
+    @Override
+    public int hashCode() {
+        return this.valeur.hashCode();
+    }
 }
