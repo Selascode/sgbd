@@ -22,5 +22,9 @@ public class BaseDeDonnees {
         this.tables = new HashMap<>();
         this.compteurSerial = 0;
     }
+
+    public String getNom(){
+        return this.nom;
+    }
         
 }
