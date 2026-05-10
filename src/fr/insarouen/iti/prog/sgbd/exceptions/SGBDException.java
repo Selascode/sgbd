@@ -4,13 +4,13 @@ package fr.insarouen.iti.prog.sgbd.exceptions;
  * @author Marwan
  */
 
-public class ErreurSGBD extends Exception{
+public class SGBDException extends Exception{
     
-    public ErreurSGBD(){
+    public SGBDException(){
         super();
     }
 
-    public ErreurSGBD(String msg){
+    public SGBDException(String msg){
         super(msg);
     }
 }

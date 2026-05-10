@@ -1,10 +1,9 @@
 # Dossier de build Maven (CRUCIAL)
 target/
 
-# Tes dossiers actuels
+# les dossiers
 classes/
 classestest/
-classestestNM/
 *.class
 
 # Documentation et IDE

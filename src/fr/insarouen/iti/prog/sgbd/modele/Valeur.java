@@ -2,7 +2,7 @@ package fr.insarouen.iti.prog.sgbd.modele;
 
 import fr.insarouen.iti.prog.sgbd.modele.Type;
 
-import fr.insarouen.iti.prog.sgbd.exceptions.ErreurTypesIncompatible;
+import fr.insarouen.iti.prog.sgbd.exceptions.TypesIncompatibleException;
 
 
 public abstract class Valeur {
@@ -19,7 +19,7 @@ public abstract class Valeur {
     }
 
     public abstract Object getDonnee();
-    public abstract int compareA(Valeur autre) throws ErreurTypesIncompatible;
+    public abstract int compareA(Valeur autre) throws TypesIncompatibleException;
     public abstract boolean estCompatible(Type t);
     
 }
