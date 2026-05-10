@@ -12,6 +12,8 @@ import java.util.Map;
  * Représente la base de données principale.
  * Gère l'ensemble des tables et le compteur global pour les types SERIAL
  */
+
+/**
 public class BaseDeDonnees {
     private String nom;
     private Map<String, Tables> tables;
@@ -23,4 +25,4 @@ public class BaseDeDonnees {
         this.compteurSerial = 0;
     }
         
-}
+}*/ 
