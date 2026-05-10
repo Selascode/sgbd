@@ -23,8 +23,14 @@ public class BaseDeDonnees {
         this.compteurSerial = 0;
     }
 
+
+    /**
+     * Donne le nom de la base de donnée
+     * @return Le nom de base de donnée
+     */
     public String getNom(){
         return this.nom;
     }
-        
+    
+
 }
