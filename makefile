@@ -11,6 +11,7 @@ JAVAC    = javac
 JAVA     = java
 JAVADOC  = javadoc
 JAR      = jar
+JAVACC   = javacc
 
 # Librairies
 JUNIT = /usr/share/java/junit4.jar:/usr/share/java/hamcrest-all.jar
@@ -22,15 +23,15 @@ JFLAGSTEST = -d $(CLASSTESTDIR) \
              -classpath $(CLASSDIR):$(CLASSTESTDIR):$(JUNIT)
 
 
-# Fichiers sources
-SOURCES := $(shell find $(SOURCEDIR) -name "*.java")
+# Fichiers sources (évaluation différée '=' pour inclure les fichiers générés par javacc)
+SOURCES = $(shell find $(SOURCEDIR) -name "*.java")
 SOURCES_TEST := $(shell find $(SOURCETESTDIR) -name "*.java")
 
 # Classes de test
 TEST_CLASS ?= fr.insarouen.iti.prog.sgbd.AllTests
 
 
-.PHONY: all comp comp-test test doc clean help
+.PHONY: all javacc comp comp-test test doc clean help
 
 # --- Dossiers ---
 $(CLASSDIR):
@@ -39,10 +40,15 @@ $(CLASSDIR):
 $(CLASSTESTDIR):
 	mkdir -p $(CLASSTESTDIR)
 
+# --- JavaCC ---
+javacc:
+	@echo "Génération du parseur avec JavaCC..."
+	$(JAVACC) -OUTPUT_DIRECTORY=$(SOURCEDIR)/fr/insarouen/iti/prog/sgbd/parseur $(SOURCEDIR)/fr/insarouen/iti/prog/sgbd/parseur/sgbd.jj
+
 # --- Compilation ---
 all: comp 
 
-comp: $(CLASSDIR)
+comp: javacc $(CLASSDIR)
 	$(JAVAC) $(JFLAGS) $(SOURCES)
 
 comp-test: $(CLASSTESTDIR) comp
@@ -64,12 +70,15 @@ doc:
 clean:
 	@echo "Nettoyage"
 	rm -rf $(CLASSDIR) $(CLASSTESTDIR) $(DOCDIR)
+	rm -f $(SOURCEDIR)/fr/insarouen/iti/prog/sgbd/parseur/*.java
+	git checkout $(SOURCEDIR)/fr/insarouen/iti/prog/sgbd/parseur/sgbd.jj || true
 
 # --- Aide ---
 help:
 	@echo "Commandes disponibles :"
 	@echo "  make                              : Compile le projet et les tests"
-	@echo "  make comp                         : Compile le code source (src -> classes)"
+	@echo "  make javacc                       : Génère les fichiers Java depuis sgbd.jj"
+	@echo "  make comp                         : Génère le parseur et compile le code source"
 	@echo "  make comp-test                    : Compile les tests (srctest -> classestest)"
 	@echo "  make test                         : Lance TEST_CLASS (défaut : AllTests)"
 	@echo "  make test TEST_CLASS=mon.pkg.Test : Lance une classe de test spécifique"
