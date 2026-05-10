@@ -111,5 +111,13 @@ public class Table {
         return this.nom_table;
     }
 
+    /**
+     * Permet d'ajouter un attribut (unbe colonne) au schma de la table
+     * @param a L'attribut à ajouter
+     */
+    public void addAttribut(Attribut a) {
+        this.attributs.add(a);
+    }
+
         
 }
