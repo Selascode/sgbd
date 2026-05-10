@@ -1,4 +1,21 @@
 package fr.insarouen.iti.prog.sgbd.modele;
+import fr.insarouen.iti.prog.sgbd.modele.Attribut;
+import fr.insarouen.iti.prog.sgbd.modele.Tuple;
+import fr.insarouen.iti.prog.sgbd.exceptions.AttributInconnuException;
+
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * Représente une table au sein d'une base de données relationnelle.
+ * Une table possède un nom unique et contient un ensemble de tuples 
+ * respectant une structure d'attributs définie.
+ * 
+ * @author Elakoum
+ * @version 1.0
+ */
 
 import fr.insarouen.iti.prog.sgbd.modele.Tuple;
 import fr.insarouen.iti.prog.sgbd.modele.Attribut;
@@ -18,17 +35,17 @@ import java.util.List;
 public class Table {
     /*Le nom de  la table dans une base de donne ce nom la est unique pour chaque table */
 
-    private String nom_table;
+    private String nom;
     private List<Attribut> attributs;
     private List<Tuple> tuples;
    
     /**
      * Construction d'une table vide 
-     * @param nom_tab nomtab a creer
+     * @param nom tab a creer
      */
 
-    public Table(String nom_tab){
-        this.nom_table=nom_tab;
+    public Table(String nom){
+        this.nom=nom;
         this.attributs = new ArrayList<>();
         this.tuples = new ArrayList<>();
     }
@@ -62,35 +79,42 @@ public class Table {
      * 
      */
     public List<Tuple> getTuples(){
-        return this.tuples;
-
-
-        
+        return Collections.unmodifiableList(this.tuples); 
     }
 
     /**
      * @param nom
      * @return l 'attribut dont il ya le nom nom
      */
-    public Attribut getAttribut(String nom){//la je pene il sera mieux si en ceera uen exception pour dire si l'attrinbut exuste ou pas
+    public Attribut getAttribut(String nom) throws AttributInconnuException{//la je pene il sera mieux si en ceera uen exception pour dire si l'attrinbut exuste ou pas
        
             for( Attribut att :this.attributs){
-                if(nom == att.getNom()){
-
+                if(nom.equals(att.getNom()) ){
                     return att;
                 }
             }
-            return null;//ici en doit enlever 
+            throw new AttributInconnuException(nom);//ici en doit enlever 
     }
+     /**
+     * @param 
+     * @return l 'attribut dont il ya le nom nom
+     */
 
+    public List<Attribut> getAttributs(){
+        return Collections.unmodifiableCollection(this.attributs);
+    }
     /***
      * 
      * @param nom
      * @return un boolean en indiquant si l attribut avec ce nom la existe ou pas 
      */
     public boolean attributExiste(String nom){
-        Attribut att= this.getAttribut(nom); // jai utiliser la methode implementer avant pour obtenir lobjet attr 
-        return this.attributs.contains(att);// dapres la java doc cette methode retourn true si existe false si non 
+        for (Attribut att : this.attributs){
+            if (nom.equals(att.getNom())){
+                return true; 
+            }
+        }
+        return false; // dapres la java doc cette methode retourn true si existe false si non 
     }
 
     /***
@@ -108,7 +132,7 @@ public class Table {
      * @return le nom de la table
      */
     public String getNom() {
-        return this.nom_table;
+        return this.nom;
     }
 
     /**
