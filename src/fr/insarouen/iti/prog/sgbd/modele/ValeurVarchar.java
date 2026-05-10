@@ -1,7 +1,7 @@
 package fr.insarouen.iti.prog.sgbd.modele;
 import fr.insarouen.iti.prog.sgbd.modele.Type;
 import fr.insarouen.iti.prog.sgbd.modele.Valeur;
-import fr.insarouen.iti.prog.sgbd.exceptions.ErreurTypesIncompatible;
+import fr.insarouen.iti.prog.sgbd.exceptions.TypesIncompatibleException;
 /**
  * Valeur de type chaîne de caractères ({@link Type#VARCHAR}) stockée dans le SGBD.
  * <p>
@@ -43,11 +43,11 @@ public class ValeurVarchar extends Valeur {
      * @param autre la valeur à comparer
      * @return un entier négatif, zéro ou positif selon que cette chaîne est
      *         lexicographiquement inférieure, égale ou supérieure à {@code autre}
-     * @throws ErreurTypesIncompatible si {@code autre} n'est pas un {@link ValeurVarchar}
+     * @throws TypesIncompatibleException si {@code autre} n'est pas un {@link ValeurVarchar}
      */
-    public int compareA(Valeur autre) throws ErreurTypesIncompatible {
+    public int compareA(Valeur autre) throws TypesIncompatibleException {
         if (!(autre instanceof ValeurVarchar)) {
-            throw new ErreurTypesIncompatible(String.format("Le type attendu : VAECHAR, type reçu : %s", autre.getType() == Type.INT ? "INT" : "SERIAL" ));
+            throw new TypesIncompatibleException(String.format("Le type attendu : VAECHAR, type reçu : %s", autre.getType() == Type.INT ? "INT" : "SERIAL" ));
         }
         ValeurVarchar autreVarchar = (ValeurVarchar) autre;
         return this.valeur.compareTo(autreVarchar.getDonnee());

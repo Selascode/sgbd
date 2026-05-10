@@ -1,7 +1,7 @@
 package fr.insarouen.iti.prog.sgbd.modele;
 
-import fr.insarouen.iti.prog.sgbd.exceptions.ErreurTableExistante;
-import fr.insarouen.iti.prog.sgbd.exceptions.ErreurTableInconnue;
+import fr.insarouen.iti.prog.sgbd.exceptions.TableExistanteException;
+import fr.insarouen.iti.prog.sgbd.exceptions.TableInconnueException;
 
 import java.util.ArrayList;
 import java.util.HashMap;

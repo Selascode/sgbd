@@ -1,7 +1,7 @@
 package fr.insarouen.iti.prog.sgbd.modele;
 import fr.insarouen.iti.prog.sgbd.modele.Type;
 import fr.insarouen.iti.prog.sgbd.modele.Valeur;
-import fr.insarouen.iti.prog.sgbd.exceptions.ErreurTypesIncompatible;
+import fr.insarouen.iti.prog.sgbd.exceptions.TypesIncompatibleException;
 /**
  * Valeur de type entier ({@link Type#INT}) stockée dans le SGBD.
  * <p>
@@ -43,11 +43,11 @@ public class ValeurInt extends Valeur {
      * @param autre la valeur à comparer
      * @return -1, zéro ou 1 selon que cette valeur est
      *         inférieure, égale ou supérieure à {@code autre}
-     * @throws ErreurTypesIncompatible si {@code autre} n'est pas un {@link ValeurInt}
+     * @throws TypesIncompatibleException si {@code autre} n'est pas un {@link ValeurInt}
      */
-    public int compareA(Valeur autre) throws ErreurTypesIncompatible {
+    public int compareA(Valeur autre) throws TypesIncompatibleException {
         if (!(autre instanceof ValeurInt)) {
-            throw new ErreurTypesIncompatible(String.format("Le type attendu est INT, type reçu est %s", autre.getType() == Type.VARCHAR ? "VARCHAR" : "SERIAL" ));
+            throw new TypesIncompatibleException(String.format("Le type attendu est INT, type reçu est %s", autre.getType() == Type.VARCHAR ? "VARCHAR" : "SERIAL" ));
         }
         ValeurInt autreInt = (ValeurInt) autre;
         return Integer.compare(valeur, autreInt.getDonnee());
