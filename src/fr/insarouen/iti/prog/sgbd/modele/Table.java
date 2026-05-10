@@ -104,5 +104,12 @@ public class Table {
         return index;
     }
 
+    /**
+     * @return le nom de la table
+     */
+    public String getNom() {
+        return this.nom_table;
+    }
+
         
 }
