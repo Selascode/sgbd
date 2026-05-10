@@ -14,7 +14,7 @@ JAR      = jar
 JAVACC   = javacc
 
 # Librairies
-JUNIT = /usr/share/java/junit4.jar:/usr/share/java/hamcrest-all.jar
+JUNIT = lib/junit-4.13.2.jar:lib/hamcrest-core-1.3.jar
 
 # Flags
 JFLAGS     = -d $(CLASSDIR) -sourcepath $(SOURCEDIR)
