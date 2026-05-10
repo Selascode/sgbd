@@ -103,11 +103,7 @@ public class Table {
      */
 
     public List<Attribut> getAttributs(){
-<<<<<<< HEAD
         return Collections.unmodifiableCollection(this.attributs);
-=======
-        return Collections.unmodifiableCollection(this.attributs)
->>>>>>> d50a5418beb2a39d0ea1d225ff4402e453214cce
     }
     /***
      * 
@@ -120,11 +116,7 @@ public class Table {
                 return true; 
             }
         }
-<<<<<<< HEAD
         return false; // dapres la java doc cette methode retourn true si existe false si non 
-=======
-        return false // dapres la java doc cette methode retourn true si existe false si non 
->>>>>>> d50a5418beb2a39d0ea1d225ff4402e453214cce
     }
 
     /***
