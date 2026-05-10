@@ -31,6 +31,14 @@ public class BaseDeDonnees {
     public String getNom(){
         return this.nom;
     }
+
+    /**
+     * Liste le nom de toutes les tables existantes.
+     * @return Une liste contenant le nom des tables
+     */
+    public List<String> listerTables() {
+        return new ArrayList<>(this.table.keySet());
+    }
     
 
 }
