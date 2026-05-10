@@ -2,6 +2,7 @@ package fr.insarouen.iti.prog.sgbd.persistance;
 
 import fr.insarouen.iti.prog.sgbd.modele.BaseDeDonnees;
 
+
 /**
  * Gere la sauvegarde et le chargement de la base de donnees.
  */

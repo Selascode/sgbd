@@ -103,7 +103,7 @@ public class Table {
      */
 
     public List<Attribut> getAttributs(){
-        return Collections.unmodifiableCollection(this.attributs);
+        return Collections.unmodifiableList(this.attributs);
     }
     /***
      * 
@@ -124,7 +124,7 @@ public class Table {
      * @param nom
      * @return lindice de l'attribut possedent le nom nom
     */
-    public int indexAttribut(String nom){//la encore il faut ajouter lexceprion ou bien throws car en utilise un methode qui est get attribut qui peut lever une exceprion 
+    public int indexAttribut(String nom) throws AttributInconnuException {//la encore il faut ajouter lexceprion ou bien throws car en utilise un methode qui est get attribut qui peut lever une exceprion 
         Attribut att=this.getAttribut(nom);
         int index= this.attributs.indexOf(att);//dapres la java doc (Returns the index of the first occurrence of the specified element in this list, or -1 if this list does not contain the elemen)
         return index;
