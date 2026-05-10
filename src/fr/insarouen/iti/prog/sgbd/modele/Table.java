@@ -1,4 +1,6 @@
 package fr.insarouen.iti.prog.sgbd.modele;
+
+import fr.insarouen.iti.prog.sgbd.modele.Tuple;
 import fr.insarouen.iti.prog.sgbd.modele.Attribut;
 import fr.insarouen.iti.prog.sgbd.modele.Tuple;
 import fr.insarouen.iti.prog.sgbd.exceptions.AttributInconnuException;
