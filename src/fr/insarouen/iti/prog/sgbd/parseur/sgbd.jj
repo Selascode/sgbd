@@ -1,0 +1,372 @@
+options {
+  STATIC = false;
+  IGNORE_CASE = true; // ignore la casse pour les mots-cle
+}
+
+PARSER_BEGIN(SGBDParser)
+
+package fr.insarouen.iti.prog.sgbd.parseur;
+
+// Importations futures pour interagir avec le modèle, avoir avec l'equipe
+// import fr.insarouen.iti.prog.sgbd.modele.*;
+
+public class SGBDParser {
+  // si option sans ast comme le conseil le sujet
+  // private BaseDeDonnees db;
+  // autres methodes utiles et d'initialisation
+  // public void setDatabase(BaseDeDonnees database) {
+  //     this.db = database;
+  // }    
+}
+
+PARSER_END(SGBDParser)
+
+/* =========================================================================
+ANALYSE LEXICALE (Tokens)
+   ========================================================================= */
+
+// Espaces et commentaires à ignorer
+SKIP : {
+  " "
+| "\t"
+| "\n"
+| "\r"
+| < "--" (~["\n","\r"])* ("\n"|"\r"|"\r\n")? > // Commentaires SQL débutant par --
+}
+
+// Mots-clés du SQL
+TOKEN : {
+  < CREATE: "CREATE" >
+| < TABLE: "TABLE" >
+| < DROP: "DROP" >
+| < INSERT: "INSERT" >
+| < INTO: "INTO" >
+| < VALUES: "VALUES" >
+| < DELETE: "DELETE" >
+| < FROM: "FROM" >
+| < WHERE: "WHERE" >
+| < SELECT: "SELECT" >
+| < AS: "AS" >
+| < TABLES: "TABLES" >
+| < EXIT: "EXIT" >
+| < QUIT: "QUIT" >
+| < AND: "AND" >
+| < OR: "OR" >
+}
+
+// Types de données supportés
+TOKEN : {
+  < TYPE_INT: "INT" >
+| < TYPE_SERIAL: "SERIAL" >
+| < TYPE_VARCHAR: "VARCHAR" >
+}
+
+// Opérateurs et Ponctuation
+TOKEN : {
+  < SEMICOLON: ";" >
+| < COMMA: "," >
+| < LPAREN: "(" >
+| < RPAREN: ")" >
+| < STAR: "*" >
+| < OP_EQ: "=" >
+| < OP_GT: ">" >
+| < OP_LT: "<" >
+}
+
+// Identifiants et Valeurs (basés sur le tableau de la fin du sujet)
+TOKEN : {
+  < NUMBER: (["0"-"9"])+ >
+| < STRING: "\"" (~["\""])* "\"" > // echaper les "
+| < ID: (["a"-"z", "A"-"Z"]) (["a"-"z", "A"-"Z", "0"-"9", "_", "."])* >
+}options {
+  STATIC = false;
+  IGNORE_CASE = true; // ignore la casse pour les mots-cle
+}
+
+PARSER_BEGIN(SGBDParser)
+
+package fr.insarouen.iti.prog.sgbd.parseur;
+
+// Importations futures pour interagir avec le modèle, avoir avec l'equipe
+// import fr.insarouen.iti.prog.sgbd.modele.*;
+
+public class SGBDParser {
+  // si option sans ast comme le conseil le sujet
+  // private BaseDeDonnees db;
+  // autres methodes utiles et d'initialisation
+  // public void setDatabase(BaseDeDonnees database) {
+  //     this.db = database;
+  // }    
+}
+
+PARSER_END(SGBDParser)
+
+/* =========================================================================
+ ANALYSE LEXICALE (Tokens)
+   ========================================================================= */
+
+// Espaces et commentaires à ignorer
+SKIP : {
+  " "
+| "\t"
+| "\n"
+| "\r"
+| < "--" (~["\n","\r"])* ("\n"|"\r"|"\r\n")? > // Commentaires SQL débutant par --
+}
+
+// Mots-clés du SQL
+TOKEN : {
+  < CREATE: "CREATE" >
+| < TABLE: "TABLE" >
+| < DROP: "DROP" >
+| < INSERT: "INSERT" >
+| < INTO: "INTO" >
+| < VALUES: "VALUES" >
+| < DELETE: "DELETE" >
+| < FROM: "FROM" >
+| < WHERE: "WHERE" >
+| < SELECT: "SELECT" >
+| < AS: "AS" >
+| < TABLES: "TABLES" >
+| < EXIT: "EXIT" >
+| < QUIT: "QUIT" >
+| < AND: "AND" >
+| < OR: "OR" >
+}
+
+// Types de données supportés
+TOKEN : {
+  < TYPE_INT: "INT" >
+| < TYPE_SERIAL: "SERIAL" >
+| < TYPE_VARCHAR: "VARCHAR" >
+}
+
+// Opérateurs et Ponctuation
+TOKEN : {
+  < SEMICOLON: ";" >
+| < COMMA: "," >
+| < LPAREN: "(" >
+| < RPAREN: ")" >
+| < STAR: "*" >
+| < OP_EQ: "=" >
+| < OP_GT: ">" >
+| < OP_LT: "<" >
+}
+
+// Identifiants et Valeurs (basés sur le tableau de la fin du sujet)
+TOKEN : {
+  < NUMBER: (["0"-"9"])+ >
+| < STRING: "\"" (~["\""])* "\"" > // echaper les "
+| < ID: (["a"-"z", "A"-"Z"]) (["a"-"z", "A"-"Z", "0"-"9", "_", "."])* >
+}
+
+/* =========================================================================
+ANALYSE SYNTAXIQUE (Grammaire)
+   ========================================================================= */
+
+// Règle principale (Point d'entrée)
+// commande ::= ( commandeCreate | commandeInsert | commandeSelect | commandeDrop | commandeDelete | commandeTables | commandeExit ) ";"
+void Commande() :
+{}
+{
+  (
+    CommandeCreate()
+  | CommandeInsert()
+  | CommandeSelect()
+  | CommandeDrop()
+  | CommandeDelete()
+  | CommandeTables()
+  | CommandeExit()
+  )
+  <SEMICOLON>
+}
+
+//  les commandes DDL
+void CommandeCreate() :
+{}
+{
+  <CREATE> <TABLE> <ID> <LPAREN> Colonne() ( <COMMA> Colonne() )* <RPAREN>
+}
+
+void Colonne() :
+{}
+{
+  <ID> Type()
+}
+
+void Type() :
+{}
+{
+  <TYPE_INT> | <TYPE_SERIAL> | <TYPE_VARCHAR>
+}
+
+void CommandeDrop() :
+{}
+{
+  <DROP> <TABLE> <ID>
+}
+
+void CommandeTables() :
+{}
+{
+  <TABLES>
+}
+
+// Placeholder pour DML et Sélection (à implémenter)
+void CommandeInsert() :
+{}
+{
+  <INSERT> <INTO> <ID> <LPAREN> <ID> ( <COMMA> <ID> )* <RPAREN>
+  <VALUES> <LPAREN> Valeur() ( <COMMA> Valeur() )* <RPAREN>
+}
+
+void Valeur() :
+{}
+{
+  <NUMBER> | <STRING>
+}
+
+void CommandeDelete() :
+{}
+{
+  <DELETE> <FROM> <ID> ( <WHERE> ExpressionLogique() )?
+}
+
+void CommandeSelect() :
+{}
+{
+  <SELECT> ( <STAR> | <ID> ( <COMMA> <ID> )* )
+  <FROM> Source() ( <COMMA> Source() )*
+  ( <WHERE> ExpressionLogique() )?
+}
+
+void Source() :
+{}
+{
+  <ID> ( (<AS>)? <ID> )?
+}
+
+void CommandeExit() :
+{}
+{
+  <EXIT> | <QUIT>
+}
+
+// Expressions logiques
+void ExpressionLogique() :
+{}
+{
+  ConditionSimple() ( (<AND> | <OR>) ConditionSimple() )*
+}
+
+void ConditionSimple() :
+{}
+{
+  <ID> ( <OP_EQ> | <OP_GT> | <OP_LT> ) ( Valeur() | <ID> )
+}
+
+
+/* =========================================================================
+ ANALYSE SYNTAXIQUE (Grammaire)
+   ========================================================================= */
+
+// Règle principale (Point d'entrée)
+// commande ::= ( commandeCreate | commandeInsert | commandeSelect | commandeDrop | commandeDelete | commandeTables | commandeExit ) ";"
+void Commande() :
+{}
+{
+  (
+    CommandeCreate()
+  | CommandeInsert()
+  | CommandeSelect()
+  | CommandeDrop()
+  | CommandeDelete()
+  | CommandeTables()
+  | CommandeExit()
+  )
+  <SEMICOLON>
+}
+
+// Placeholder pour les commandes DDL
+void CommandeCreate() :
+{}
+{
+  <CREATE> <TABLE> <ID> <LPAREN> Colonne() ( <COMMA> Colonne() )* <RPAREN>
+}
+
+void Colonne() :
+{}
+{
+  <ID> Type()
+}
+
+void Type() :
+{}
+{
+  <TYPE_INT> | <TYPE_SERIAL> | <TYPE_VARCHAR>
+}
+
+void CommandeDrop() :
+{}
+{
+  <DROP> <TABLE> <ID>
+}
+
+void CommandeTables() :
+{}
+{
+  <TABLES>
+}
+
+// Placeholder pour DML et Sélection (à implémenter)
+void CommandeInsert() :
+{}
+{
+  <INSERT> <INTO> <ID> <LPAREN> <ID> ( <COMMA> <ID> )* <RPAREN>
+  <VALUES> <LPAREN> Valeur() ( <COMMA> Valeur() )* <RPAREN>
+}
+
+void Valeur() :
+{}
+{
+  <NUMBER> | <STRING>
+}
+
+void CommandeDelete() :
+{}
+{
+  <DELETE> <FROM> <ID> ( <WHERE> ExpressionLogique() )?
+}
+
+void CommandeSelect() :
+{}
+{
+  <SELECT> ( <STAR> | <ID> ( <COMMA> <ID> )* )
+  <FROM> Source() ( <COMMA> Source() )*
+  ( <WHERE> ExpressionLogique() )?
+}
+
+void Source() :
+{}
+{
+  <ID> ( (<AS>)? <ID> )?
+}
+
+void CommandeExit() :
+{}
+{
+  <EXIT> | <QUIT>
+}
+
+// Expressions logiques
+void ExpressionLogique() :
+{}
+{
+  ConditionSimple() ( (<AND> | <OR>) ConditionSimple() )*
+}
+
+void ConditionSimple() :
+{}
+{
+  <ID> ( <OP_EQ> | <OP_GT> | <OP_LT> ) ( Valeur() | <ID> )
+}
