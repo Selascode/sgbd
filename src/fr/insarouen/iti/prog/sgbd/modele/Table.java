@@ -147,7 +147,55 @@ public class Table {
     public String getNom() {
         return this.nom;
     }
+    
 
+    public Table projection(List<String> nomsColonnes) throws AttributInconnuException{
+        // On verifie que les colonnes existe
+        for (String nomCol : nomsColonnes) {
+        boolean existe = false;
+        for (Attribut attr : this.attributs) {
+            if (attr.getNom().equals(nomCol)) {
+                existe = true;
+                break;
+            }
+        }
+        if (!existe) {
+            throw new AttributInconnuException("Colonne " + nomCol + " inconnue");
+        }
+    }
+    // on garde les attribut demandés
+    List<Attribut> nouvelleAttributs = new ArrayList<>();
+    for (String nomCol : nomsColonnes) {
+        for (Attribut attr : this.attributs) {
+            if (attr.getNom().equals(nomCol)) {
+                nouvelleAttributs.add(attr);
+                break;
+            }
+        }
+    }
+
+    
+    
+    Table nouvelleTable = new Table(this.nom, nouvelleAttributs);
+
+    // on crée la nouvelle table
+    for (Tuple ancien : this.tuples) {
+        List<Valeur> nouvellesValeurs = new ArrayList<>();
+        for (String nomCol : nomsColonnes) {
+            for (int i = 0; i < this.attributs.size(); i++) {
+                if (this.attributs.get(i).getNom().equals(nomCol)) {
+                    nouvellesValeurs.add(ancien.getValeur(i));
+                    break;
+                }
+            }
+        }
+        nouvelleTable.insererTuple(new Tuple(nouvellesValeurs));
+    }
+
+    return nouvelleTable;
+}
+
+    }
     /**
      * Permet d'ajouter un attribut (unbe colonne) au schma de la table
      * @param a L'attribut à ajouter
