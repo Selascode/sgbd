@@ -251,10 +251,31 @@ Valeur Valeur() :
 | t=<STRING>  { return new ValeurVarchar(t.image.substring(1, t.image.length() - 1)); }
 }
 
+// DELETE FROM nom (WHERE condition)?
 void CommandeDelete() :
-{}
+{ 
+  Token nomTable; 
+}
 {
-  <DELETE> <FROM> <ID> ( <WHERE> ExpressionLogique() )?
+  <DELETE> <FROM> nomTable=<ID>
+  (
+    <WHERE> ExpressionLogique()
+    {
+      System.err.println("[INFO] DELETE avec WHERE non encore implémenté");
+    }
+  )?
+  {
+    // Si pas de WHERE : je supprime tous les tuples de la table
+    try {
+      Table table = db.getTable(nomTable.image);
+      int nb = table.supprimerTuples(new java.util.ArrayList<>(table.getTuples()));
+      System.out.println(nb + " ligne(s  ) supprimé(s) de '" + nomTable.image + "'");
+    } catch (TableInconnueException e) {
+      System.err.println("[ERREUR] " + e.getMessage());
+    } catch (fr.insarouen.iti.prog.sgbd.exceptions.TupleInconnuException e) {
+      System.err.println("[ERREUR] " + e.getMessage());
+    }
+  }
 }
 
 void CommandeSelect() :
