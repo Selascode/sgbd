@@ -44,13 +44,13 @@ public class TestTable {
         valeurs1.add(new ValeurVarchar("Batman"));
         valeurs1.add(new ValeurInt(100));
         this.tuple1 = new Tuple(valeurs1);
- 
+
         List<Valeur> valeurs2 = new ArrayList<>();
         valeurs2.add(new ValeurInt(2));
         valeurs2.add(new ValeurVarchar("Robin"));
         valeurs2.add(new ValeurInt(60));
         this.tuple2 = new Tuple(valeurs2);
- 
+
         List<Valeur> valeurs3 = new ArrayList<>();
         valeurs3.add(new ValeurInt(3));
         valeurs3.add(new ValeurVarchar("Batgirl"));
@@ -95,7 +95,7 @@ public class TestTable {
     public void test_Table_getAttribut_id() throws AttributInconnuException {
         assertThat(this.tableHeros.getAttribut("id"), equalTo(this.attributId));
     }
- 
+
     @Test
     public void test_Table_getAttribut_nom() throws AttributInconnuException {
         assertThat(this.tableHeros.getAttribut("nom"), equalTo(this.attributNom));
