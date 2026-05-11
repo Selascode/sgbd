@@ -103,6 +103,29 @@ public class BaseDeDonnees {
     }
 
     /**
+     * Retourne la valeur actuelle du compteur SERIAL global.
+     *
+     * @return la derniere valeur SERIAL utilisée
+     */
+    public int getCompteurSerial() {
+        return this.compteurSerial;
+    }
+
+    /**
+     * Restaure la valeur du compteur SERIAL global.
+     * Cette methode est principalement utilisée lors du chargement
+     * d'une base sauvegardée.
+     *
+     * @param compteurSerial la derniere valeur SERIAL deja utilisée
+     */
+    public void restaurerCompteurSerial(int compteurSerial) {
+        if (compteurSerial < 0) {
+            throw new IllegalArgumentException("Le compteur SERIAL ne peut pas etre negatif.");
+        }
+        this.compteurSerial = compteurSerial;
+    }
+
+    /**
      * Retourne le nom de la base de données.
      *
      * @return le nom
