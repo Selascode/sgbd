@@ -44,7 +44,7 @@ public class Table {
      * 
      * @param t Tuple qui contient des valeur d'attribut
      */
-    public void insererTuple(Tuple t){
+    public void insererTuple(Tuple t){ // a verifier que les valeur inserer sont bien les attribut demander 
         this.tuples.add(t);
     }
 
