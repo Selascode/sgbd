@@ -75,4 +75,9 @@ public class ValeurVarchar extends Valeur {
     public int hashCode() {
         return this.valeur.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return this.valeur;
+    }
 }

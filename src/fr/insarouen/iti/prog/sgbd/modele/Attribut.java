@@ -58,9 +58,6 @@ public class Attribut {
      * @return retourne la représentation textuelle de l'attribut 
      */
     public String toString() {
-    return String.format("%s %s",this.nom, this.type);
-}
-
-
-    
+        return String.format("%s %s",this.nom, this.type);
+    }
 }

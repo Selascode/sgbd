@@ -1,11 +1,7 @@
 package fr.insarouen.iti.prog.sgbd.modele;
 
-import fr.insarouen.iti.prog.sgbd.modele.Tuple;
-import fr.insarouen.iti.prog.sgbd.modele.Attribut;
-import fr.insarouen.iti.prog.sgbd.modele.Tuple;
 import fr.insarouen.iti.prog.sgbd.exceptions.AttributInconnuException;
 import fr.insarouen.iti.prog.sgbd.exceptions.TupleInconnuException;
-
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,35 +9,22 @@ import java.util.List;
 
 /**
  * Représente une table au sein d'une base de données relationnelle.
- * Une table possède un nom unique et contient un ensemble de tuples 
+ * Une table possède un nom unique et contient un ensemble de tuples
  * respectant une structure d'attributs définie.
- * 
+ *
  * @author Elakoum
  * @version 1.0
  */
-
-import fr.insarouen.iti.prog.sgbd.modele.Tuple;
-import fr.insarouen.iti.prog.sgbd.modele.Attribut;
-
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * Représente une table au sein d'une base de données relationnelle.
- * Une table possède un nom unique et contient un ensemble de tuples 
- * respectant une structure d'attributs définie.
- * 
- * @author Elakoum
- * @version 1.0
- */
-
 public class Table {
-    /*Le nom de  la table dans une base de donne ce nom la est unique pour chaque table */
+    /*
+     * Le nom de la table dans une base de donne ce nom la est unique pour chaque
+     * table
+     */
 
     private String nom;
     private List<Attribut> attributs;
     private List<Tuple> tuples;
-   
+
     /**
      * Construction d'une table vide 
      * Lors de la creation dune table en fait CREATE NOM (aat1,att2,att3)
@@ -49,42 +32,41 @@ public class Table {
      * @param attibuts contient la liste d'attributs à ajouter
      */
 
-    public Table(String nom, List<Attribut> attributs){ // en se basant sur lexemple de crearion d'une table de fichier exemple du moodle
+    public Table(String nom, List<Attribut> attributs) { // en se basant sur lexemple de crearion d'une table de fichier exemple du moodle
     
-        this.nom=nom;
+        this.nom = nom;
         this.attributs = new ArrayList<>(attributs);
         this.tuples = new ArrayList<>();
     }
 
     /**
-     * Permet linsertion de tuple dans une table 
+     * Permet linsertion de tuple dans une table
+     * 
      * @param t Tuple qui contient des valeur d'attribut
      */
-    public void insererTuple(Tuple t){ // a verifier que les valeur inserer sont bien les attribut demander 
+    public void insererTuple(Tuple t){
         this.tuples.add(t);
     }
-
-
 
     /***
      * 
      * @param tuplesASupprimer
-     * @return retourne le nb tuple qui sont supprimer 
+     * @return retourne le nb tuple qui sont supprimer
      */
     public int supprimerTuples(List<Tuple> tuplesASupprimer) throws TupleInconnuException {
 
         // Vérfications pour eviter de perdre de l'information
 
-        for (Tuple t : tuplesASupprimer){
-            if (!this.tuples.contains(t)){
+        for (Tuple t : tuplesASupprimer) {
+            if (!this.tuples.contains(t)) {
                 throw new TupleInconnuException(String.format("Le tuple %s n'existe pas ", t.toString()));
             }
         }
-        // suppression 
+        // suppression
         int tailleAvant = this.tuples.size();
         this.tuples.removeAll(tuplesASupprimer);
         int tailleApres = this.tuples.size();
-        
+
         return tailleAvant - tailleApres; // La différence nous donne le nombre de lignes supprimées
     }
 
@@ -93,53 +75,63 @@ public class Table {
      * @return retourne la liste des tuples de la tables
      * 
      */
-    public List<Tuple> getTuples(){
-        return Collections.unmodifiableList(this.tuples); 
+    public List<Tuple> getTuples() {
+        return Collections.unmodifiableList(this.tuples);
     }
 
     /**
      * @param nom
      * @return l 'attribut dont il ya le nom nom
      */
-    public Attribut getAttribut(String nom) throws AttributInconnuException{//la je pene il sera mieux si en ceera uen exception pour dire si l'attrinbut exuste ou pas
-       
-            for( Attribut att :this.attributs){
-                if(nom.equals(att.getNom()) ){
-                    return att;
-                }
+    public Attribut getAttribut(String nom) throws AttributInconnuException {// la je pene il sera mieux si en ceera uen
+                                                                             // exception pour dire si l'attrinbut
+                                                                             // exuste ou pas
+
+        for (Attribut att : this.attributs) {
+            if (nom.equals(att.getNom())) {
+                return att;
             }
-            throw new AttributInconnuException(nom);//ici en doit enlever 
+        }
+        throw new AttributInconnuException(nom);// ici en doit enlever
     }
-     /**
-     * @param 
+
+    /**
+     * @param
      * @return l 'attribut dont il ya le nom nom
      */
 
-    public List<Attribut> getAttributs(){
+    public List<Attribut> getAttributs() {
         return Collections.unmodifiableList(this.attributs);
-    }
-    /***
-     * 
-     * @param nom
-     * @return un boolean en indiquant si l attribut avec ce nom la existe ou pas 
-     */
-    public boolean attributExiste(String nom){
-        for (Attribut att : this.attributs){
-            if (nom.equals(att.getNom())){
-                return true; 
-            }
-        }
-        return false; // dapres la java doc cette methode retourn true si existe false si non 
     }
 
     /***
-     * Pour obtenir l'indice dun attribut pour gerer apres le auto incremente  
+     * 
+     * @param nom
+     * @return un boolean en indiquant si l attribut avec ce nom la existe ou pas
+     */
+    public boolean attributExiste(String nom) {
+        for (Attribut att : this.attributs) {
+            if (nom.equals(att.getNom())) {
+                return true;
+            }
+        }
+        return false; // dapres la java doc cette methode retourn true si existe false si non
+    }
+
+    /***
+     * Pour obtenir l'indice dun attribut pour gerer apres le auto incremente
+     * 
      * @param nom
      * @return lindice de l'attribut possedent le nom nom
-    */
-    public int indexAttribut(String nom) throws AttributInconnuException {//la encore il faut ajouter lexceprion ou bien throws car en utilise un methode qui est get attribut qui peut lever une exceprion 
-        Attribut att=this.getAttribut(nom);
-        int index= this.attributs.indexOf(att);//dapres la java doc (Returns the index of the first occurrence of the specified element in this list, or -1 if this list does not contain the elemen)
+     */
+    public int indexAttribut(String nom) throws AttributInconnuException {// la encore il faut ajouter lexceprion ou
+                                                                          // bien throws car en utilise un methode qui
+                                                                          // est get attribut qui peut lever une
+                                                                          // exceprion
+        Attribut att = this.getAttribut(nom);
+        int index = this.attributs.indexOf(att);// dapres la java doc (Returns the index of the first occurrence of the
+                                                // specified element in this list, or -1 if this list does not contain
+                                                // the elemen)
         return index;
     }
 
@@ -149,14 +141,99 @@ public class Table {
     public String getNom() {
         return this.nom;
     }
+    
+    /***
+     * fait la projection sur les atrributs demandé
+     * @param nomsColonnes
+     * @return la table apres projection
+    
+    */
+    public Table projection(List<String> nomsColonnes) throws AttributInconnuException{
+        // On verifie que les colonnes existe
+        for (String nomCol : nomsColonnes) {
+        boolean existe = false;
+        for (Attribut attr : this.attributs) {
+            if (attr.getNom().equals(nomCol)) {
+                existe = true;
+                break;
+            }
+        }
+        if (!existe) {
+            throw new AttributInconnuException("Colonne " + nomCol + " inconnue");
+        }
+    }
+    // on garde les attribut demandés
+    List<Attribut> nouvelleAttributs = new ArrayList<>();
+    for (String nomCol : nomsColonnes) {
+        for (Attribut attr : this.attributs) {
+            if (attr.getNom().equals(nomCol)) {
+                nouvelleAttributs.add(attr);
+                break;
+            }
+        }
+    }
 
+    Table nouvelleTable = new Table(this.nom, nouvelleAttributs);
+
+    // on crée la nouvelle table
+    for (Tuple ancien : this.tuples) {
+        List<Valeur> nouvellesValeurs = new ArrayList<>();
+        for (String nomCol : nomsColonnes) {
+            for (int i = 0; i < this.attributs.size(); i++) {
+                if (this.attributs.get(i).getNom().equals(nomCol)) {
+                    nouvellesValeurs.add(ancien.getValeur(i));
+                    break;
+                }
+            }
+        }
+        nouvelleTable.insererTuple(new Tuple(nouvellesValeurs));
+    }
+
+    return nouvelleTable;
+}
+
+    public Table produitCartesien(Table autre){
+        // on crée une liste avec tout les attributs
+        List<Attribut> attributsFusion = new ArrayList<>(this.attributs);
+        attributsFusion.addAll(autre.attributs);
+        // on crée la nouvelle table
+        String nomproduitcartesien = this.nom + "_" + autre.nom;
+        Table newtable = new Table(nomproduitcartesien , attributsFusion);
+        // On parcours les tuples de la premiere table
+        for (Tuple tupleThis : this.tuples){
+            // On parcours les tuples de la deuxieme table
+            for(Tuple tupleAutre : autre.tuples){
+                //on crée la liste des attributs des deux tables
+                List<Valeur> valeursFusionnees = new ArrayList<>();
+                // on ajoute les valeurs du premier tuple
+                for (int i = 0; i < tupleThis.taille(); i++) {
+                    valeursFusionnees.add(tupleThis.getValeur(i));
+                }
+                // on ajouter les valeurs du second tuple
+                for (int i = 0; i < tupleAutre.taille(); i++) {
+                    valeursFusionnees.add(tupleAutre.getValeur(i));
+                }
+                // Créer et insérer le nouveau tuple
+                Tuple nouveauTuple = new Tuple(valeursFusionnees);
+                newtable.insererTuple(nouveauTuple);
+            }
+        }
+        return newtable;
+    }
+
+
+    
+
+
+
+    
     /**
      * Permet d'ajouter un attribut (unbe colonne) au schma de la table
+     * 
      * @param a L'attribut à ajouter
      */
     public void addAttribut(Attribut a) {
         this.attributs.add(a);
     }
 
-        
 }

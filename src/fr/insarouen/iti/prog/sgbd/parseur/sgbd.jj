@@ -7,16 +7,29 @@ PARSER_BEGIN(SGBDParser)
 
 package fr.insarouen.iti.prog.sgbd.parseur;
 
-// Importations futures pour interagir avec le modèle, avoir avec l'equipe
-// import fr.insarouen.iti.prog.sgbd.modele.*;
+import fr.insarouen.iti.prog.sgbd.modele.BaseDeDonnees;
+import fr.insarouen.iti.prog.sgbd.modele.Table;
+import fr.insarouen.iti.prog.sgbd.modele.Attribut;
+import fr.insarouen.iti.prog.sgbd.modele.Type;
+import fr.insarouen.iti.prog.sgbd.exceptions.TableExistanteException;
+import fr.insarouen.iti.prog.sgbd.exceptions.TableInconnueException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SGBDParser {
-  // si option sans ast comme le conseil le sujet
-  // private BaseDeDonnees db;
-  // autres methodes utiles et d'initialisation
-  // public void setDatabase(BaseDeDonnees database) {
-  //     this.db = database;
-  // }    
+
+  /** notre base de données sur laquelle le parseur va directement exécuter ses commandes
+   * au lieu de faire une nouvelle class Commandes et retourner des instances de celles ci
+   */
+  private BaseDeDonnees db;
+
+  /**
+   * Injecte la base de données cible
+   * Doit etre appelé avant toute command
+   */
+  public void setDatabase(BaseDeDonnees database) {
+      this.db = database;
+  }
 }
 
 PARSER_END(SGBDParser)
@@ -31,7 +44,7 @@ SKIP : {
 | "\t"
 | "\n"
 | "\r"
-| < "--" (~["\n","\r"])* ("\n"|"\r"|"\r\n")? > // Commentaires SQL débutant par --
+| < "--" (~["\n","\r"])* ("\n"|"\r"|"\r\n")? > // tpous les ommentaires SQL débutant par --
 }
 
 // Mots-clés du SQL
@@ -100,35 +113,78 @@ void Commande() :
   <SEMICOLON>
 }
 
-//  les commandes DDL
+// CREATE TABLE nom (col1 TYPE, col2 TYPE, ...)
 void CommandeCreate() :
-{}
 {
-  <CREATE> <TABLE> <ID> <LPAREN> Colonne() ( <COMMA> Colonne() )* <RPAREN>
+  Token nomTable;
+  List<Attribut> schema = new ArrayList<>();
+}
+{
+  <CREATE> <TABLE> nomTable=<ID>
+  <LPAREN> Colonne(schema) ( <COMMA> Colonne(schema) )* <RPAREN>
+  {
+    Table t = new Table(nomTable.image, schema);
+    try {
+      db.creerTable(t);
+      System.out.println("Table ''" + nomTable.image + "' créée.");
+    } catch (TableExistanteException e) {
+      System.err.println("[ERREUR] " + e.getMessage());
+    }
+  }
 }
 
-void Colonne() :
-{}
+// Colonne : ajoute un Attribut dans le schema
+void Colonne(List<Attribut> schema) :
+{ 
+  Token nomCol; 
+  Type typeCol; 
+}
 {
-  <ID> Type()
+  nomCol=<ID> typeCol=Type()
+  { 
+    schema.add(new Attribut(nomCol.image, typeCol)); 
+  }
 }
 
-void Type() :
+// Type : retourne le Type Java correspondant au mot-clé lu
+Type Type() :
 {}
 {
-  <TYPE_INT> | <TYPE_SERIAL> | <TYPE_VARCHAR>
+  <TYPE_INT>     { return Type.INT; }
+| <TYPE_SERIAL>  { return Type.SERIAL; }
+| <TYPE_VARCHAR> { return Type.VARCHAR; }
 }
 
+// DROP TABLE nom
 void CommandeDrop() :
-{}
+{ 
+  Token nomTable; 
+}
 {
-  <DROP> <TABLE> <ID>
+  <DROP> <TABLE> nomTable=<ID>
+  {
+    try {
+      db.supprimerTable(nomTable.image);
+      System.out.println("Table '" + nomTable.image + "' supprimée.");
+    } catch (TableInconnueException e) {
+      System.err.println("[ERREUR] " + e.getMessage());
+    }
+  }
 }
 
+// TABLES : liste toutes les tables existantes
 void CommandeTables() :
 {}
 {
   <TABLES>
+  {
+    List<String> tables = db.listerTables();
+    if (tables.isEmpty()) {
+      System.out.println("(Aucune table)");
+    } else {
+      System.out.println("Tables : " + tables);
+    }
+  }
 }
 
 // Placeholder pour DML et Sélection (à implémenter)

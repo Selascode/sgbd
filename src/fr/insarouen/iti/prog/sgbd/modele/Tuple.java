@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Objects;
+
 
 
 /**
@@ -55,5 +57,22 @@ public class Tuple {
         return this.values.stream()
         .map(v -> v.getDonnee().toString())
         .collect(Collectors.joining(", ", "[", "]"));
+    }
+    /**
+     * @return si deux tuples sont identiques
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Tuple)) return false;
+        Tuple autre = (Tuple) o;
+        return this.values.equals(autre.values); // délègue au equals de Valeur
+    }
+    /**
+     * @return le hashcode d'un tuple
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.values);
     }
 }
