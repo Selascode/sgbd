@@ -17,7 +17,7 @@ import java.util.List;
 public class Tuple {
     private List<Valeur> values;
     public Tuple(List<Valeur> values){
-        this.values=values;//new ArrayList<>(values);
+        this.values=new ArrayList<>(values);
 
     }
 
