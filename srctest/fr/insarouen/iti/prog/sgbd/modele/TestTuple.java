@@ -142,5 +142,22 @@ public class TestTuple {
         assertThat(this.tupleVide.getValeurs().size(), equalTo(0));
     }
 
-    
+    @Test(expected = UnsupportedOperationException.class)
+    public void test_Tuple_getValeurs_immuable(){
+        this.tupleInt.getValeurs().add(new ValeurInt(10)); 
+    }
+
+    @Test
+    public void test_Tuple_constructeur_copie(){
+        List<Valeur> valeurs = new ArrayList<>();
+        valeurs.add(new ValeurInt(1));
+        Tuple t = new Tuple(valeurs);
+        valeurs.add(new ValeurInt(2));
+        assertThat(t.taille(), equalTo(1));
+    }
+    @Test
+    public void test_Tuple_Mixte_getValeurs() {
+        List<Valeur> valeurs = this.tupleMixte.getValeurs();
+        assertThat(valeurs.size(), equalTo(3));
+}
 }
