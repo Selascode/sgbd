@@ -240,7 +240,7 @@ public class TestTable {
         assertThat(result.getAttributs().get(1), equalTo(this.attributPuissance));
     }
 
-    
+
     @Test
     public void test_Table_projection_valeursTuples() throws AttributInconnuException {
         this.tableHeros.insererTuple(this.tuple1); // [1, "Batman", 100]
@@ -329,6 +329,139 @@ public class TestTable {
         colonnes.add("colonne_inexistante");
 
         this.tableHeros.projection(colonnes);
+    }
+
+        // ============ TESTS PRODUIT CARTESIEN ============
+
+    // Vérification du nom de la nouvelle table
+    @Test
+    public void test_Table_produitCartesien_nom() {
+        Table result = this.tableHeros.produitCartesien(this.tableVide);
+        assertThat(result.getNom(), equalTo("heros_de_l_insa_vide"));
+    }
+
+    // Vérification de la fusion des attributs
+    @Test
+    public void test_Table_produitCartesien_attributs() {
+        Attribut attributVille = new Attribut("ville", Type.VARCHAR);
+        List<Attribut> attributsVille = new ArrayList<>();
+        attributsVille.add(attributVille);
+        Table tableVilles = new Table("villes", attributsVille);
+
+        Table result = this.tableHeros.produitCartesien(tableVilles);
+
+        assertThat(result.getAttributs().size(), equalTo(4)); // id, nom, puissance, ville
+        assertThat(result.getAttributs().get(0), equalTo(this.attributId));
+        assertThat(result.getAttributs().get(1), equalTo(this.attributNom));
+        assertThat(result.getAttributs().get(2), equalTo(this.attributPuissance));
+        assertThat(result.getAttributs().get(3), equalTo(attributVille));
+    }
+
+    // Vérification du nombre de tuples (n × m)
+    @Test
+    public void test_Table_produitCartesien_nbTuples() {
+        Attribut attributVille = new Attribut("ville", Type.VARCHAR);
+        List<Attribut> attributsVille = new ArrayList<>();
+        attributsVille.add(attributVille);
+        Table tableVilles = new Table("villes", attributsVille);
+
+        List<Valeur> valeursVille1 = new ArrayList<>();
+        valeursVille1.add(new ValeurVarchar("Paris"));
+        tableVilles.insererTuple(new Tuple(valeursVille1));
+
+        List<Valeur> valeursVille2 = new ArrayList<>();
+        valeursVille2.add(new ValeurVarchar("Londres"));
+        tableVilles.insererTuple(new Tuple(valeursVille2));
+
+        this.tableHeros.insererTuple(this.tuple1); // Batman
+        this.tableHeros.insererTuple(this.tuple2); // Robin
+
+        Table result = this.tableHeros.produitCartesien(tableVilles);
+
+        assertThat(result.getTuples().size(), equalTo(4)); // 2 × 2
+    }
+
+    // Vérification de l'ordre et du contenu des tuples
+    @Test
+    public void test_Table_produitCartesien_contenuTuples() {
+        Attribut attributVille = new Attribut("ville", Type.VARCHAR);
+        List<Attribut> attributsVille = new ArrayList<>();
+        attributsVille.add(attributVille);
+        Table tableVilles = new Table("villes", attributsVille);
+
+        List<Valeur> valeursVille1 = new ArrayList<>();
+        valeursVille1.add(new ValeurVarchar("Paris"));
+        tableVilles.insererTuple(new Tuple(valeursVille1));
+
+        this.tableHeros.insererTuple(this.tuple1); // [1, Batman, 100]
+        this.tableHeros.insererTuple(this.tuple2); // [2, Robin, 60]
+
+        Table result = this.tableHeros.produitCartesien(tableVilles);
+
+        // 2 tuples × 1 tuple = 2 tuples
+        assertThat(result.getTuples().size(), equalTo(2));
+
+        // Vérification du premier tuple fusionné [1, Batman, 100, Paris]
+        assertThat(result.getTuples().get(0).getValeur(0).toString(), equalTo("1"));
+        assertThat(result.getTuples().get(0).getValeur(1).toString(), equalTo("Batman"));
+        assertThat(result.getTuples().get(0).getValeur(2).toString(), equalTo("100"));
+        assertThat(result.getTuples().get(0).getValeur(3).toString(), equalTo("Paris"));
+
+        // Vérification du second tuple fusionné [2, Robin, 60, Paris]
+        assertThat(result.getTuples().get(1).getValeur(0).toString(), equalTo("2"));
+        assertThat(result.getTuples().get(1).getValeur(1).toString(), equalTo("Robin"));
+        assertThat(result.getTuples().get(1).getValeur(2).toString(), equalTo("60"));
+        assertThat(result.getTuples().get(1).getValeur(3).toString(), equalTo("Paris"));
+    }
+
+    // Table vide à gauche → résultat vide
+    @Test
+    public void test_Table_produitCartesien_gaucheVide() {
+        this.tableHeros.insererTuple(this.tuple1);
+
+        Table result = this.tableVide.produitCartesien(this.tableHeros);
+
+        assertThat(result.getTuples().size(), equalTo(0));
+    }
+
+    // Table vide à droite → résultat vide
+    @Test
+    public void test_Table_produitCartesien_droiteVide() {
+        this.tableHeros.insererTuple(this.tuple1);
+
+        Table result = this.tableHeros.produitCartesien(this.tableVide);
+
+        assertThat(result.getTuples().size(), equalTo(0));
+    }
+
+    // Les deux tables vides → résultat vide
+    @Test
+    public void test_Table_produitCartesien_deuxTablesVides() {
+        Table autreVide = new Table("autreVide", new ArrayList<>());
+
+        Table result = this.tableVide.produitCartesien(autreVide);
+
+        assertThat(result.getTuples().size(), equalTo(0));
+        assertThat(result.getAttributs().size(), equalTo(0));
+    }
+
+    // Vérification que la table originale n'est pas modifiée
+    @Test
+    public void test_Table_produitCartesien_sansModificationOriginale() {
+        this.tableHeros.insererTuple(this.tuple1);
+        this.tableHeros.insererTuple(this.tuple2);
+
+        Attribut attributVille = new Attribut("ville", Type.VARCHAR);
+        List<Attribut> attributsVille = new ArrayList<>();
+        attributsVille.add(attributVille);
+        Table tableVilles = new Table("villes", attributsVille);
+        tableVilles.insererTuple(new Tuple(List.of(new ValeurVarchar("Paris"))));
+
+        this.tableHeros.produitCartesien(tableVilles);
+
+        // La table originale ne doit pas avoir été modifiée
+        assertThat(this.tableHeros.getTuples().size(), equalTo(2));
+        assertThat(this.tableHeros.getAttributs().size(), equalTo(3));
     }
 
 }

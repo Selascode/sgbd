@@ -148,7 +148,12 @@ public class Table {
         return this.nom;
     }
     
-
+    /***
+     * fait la projection sur les atrributs demandé
+     * @param nomsColonnes
+     * @return la table apres projection
+    
+    */
     public Table projection(List<String> nomsColonnes) throws AttributInconnuException{
         // On verifie que les colonnes existe
         for (String nomCol : nomsColonnes) {
@@ -174,8 +179,6 @@ public class Table {
         }
     }
 
-    
-    
     Table nouvelleTable = new Table(this.nom, nouvelleAttributs);
 
     // on crée la nouvelle table
@@ -194,6 +197,40 @@ public class Table {
 
     return nouvelleTable;
 }
+
+    public Table produitCartesien(Table autre){
+        // on crée une liste avec tout les attributs
+        List<Attribut> attributsFusion = new ArrayList<>(this.attributs);
+        attributsFusion.addAll(autre.attributs);
+        // on crée la nouvelle table
+        String nomproduitcartesien = this.nom + "_" + autre.nom;
+        Table newtable = new Table(nomproduitcartesien , attributsFusion);
+        // On parcours les tuples de la premiere table
+        for (Tuple tupleThis : this.tuples){
+            // On parcours les tuples de la deuxieme table
+            for(Tuple tupleAutre : autre.tuples){
+                //on crée la liste des attributs des deux tables
+                List<Valeur> valeursFusionnees = new ArrayList<>();
+                // on ajoute les valeurs du premier tuple
+                for (int i = 0; i < tupleThis.taille(); i++) {
+                    valeursFusionnees.add(tupleThis.getValeur(i));
+                }
+                // on ajouter les valeurs du second tuple
+                for (int i = 0; i < tupleAutre.taille(); i++) {
+                    valeursFusionnees.add(tupleAutre.getValeur(i));
+                }
+                // Créer et insérer le nouveau tuple
+                Tuple nouveauTuple = new Tuple(valeursFusionnees);
+                newtable.insererTuple(nouveauTuple);
+            }
+        }
+        return newtable;
+    }
+
+
+    
+
+
 
     
     /**
