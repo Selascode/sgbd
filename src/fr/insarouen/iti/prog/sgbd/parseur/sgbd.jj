@@ -278,12 +278,79 @@ void CommandeDelete() :
   }
 }
 
+// SELECT cols FROM sources (WHERE condition)?
 void CommandeSelect() :
-{}
 {
-  <SELECT> ( <STAR> | <ID> ( <COMMA> <ID> )* )
-  <FROM> Source() ( <COMMA> Source() )*
-  ( <WHERE> ExpressionLogique() )?
+  Token col;
+  Token alias;
+  List<String> colonnes = new ArrayList<>();
+  Token source;
+  List<String> sources   = new ArrayList<>();
+  boolean etoile = false;
+}
+{
+  <SELECT>
+  (
+    <STAR> { etoile = true; }
+  |
+    col=<ID> { colonnes.add(col.image); }
+    ( <COMMA> col=<ID> { colonnes.add(col.image); } )*
+  )
+  <FROM> Source(sources) ( <COMMA> Source(sources) )*
+  (
+    <WHERE> ExpressionLogique()
+    {
+      // TODO : brancher quand ExpressionLogique + algèbre relationnelle seront implémentées
+      System.err.println("[INFO] SELECT avec WHERE non encore implémenté (en attente du module algèbre).");
+    }
+  )?
+  {
+    if (sources.size() > 1) {
+      System.err.println("[INFO] SELECT multi-tables (jointure) non encore implémenté.");
+      return;
+    }
+    try {
+      Table table = db.getTable(sources.get(0));
+      List<Attribut> schema = table.getAttributs();
+
+      // determiner les colonnes à afficher
+      List<Integer> indices = new ArrayList<>();
+      List<String> entetes  = new ArrayList<>();
+      if (etoile) {
+        for (int i = 0; i < schema.size(); i++) {
+          indices.add(i);
+          entetes.add(schema.get(i).getNom());
+        }
+      } else {
+        for (String nomCol : colonnes) {
+          entetes.add(nomCol);
+          indices.add(table.indexAttribut(nomCol));
+        }
+      }
+
+      // Affichage en tableau, bla bla bl
+      int largeur = 18;
+      StringBuilder ligne = new StringBuilder("|");
+      for (String e : entetes)
+        ligne.append(String.format(" %-" + (largeur-2) + "s |", e));
+      String separateur = "+" + ("-".repeat(largeur) + "+").repeat(entetes.size());
+      System.out.println(separateur);
+      System.out.println(ligne);
+      System.out.println(separateur);
+      for (Tuple t : table.getTuples()) {
+        StringBuilder row = new StringBuilder("|");
+        for (int idx : indices)
+          row.append(String.format(" %-" + (largeur-2) + "s |", t.getValeur(idx).getDonnee()));
+        System.out.println(row);
+      }
+      System.out.println(separateur);
+      System.out.println(table.getTuples().size() + " ligne(s).");
+    } catch (TableInconnueException e) {
+      System.err.println("[ERREUR] " + e.getMessage());
+    } catch (AttributInconnuException e) {
+      System.err.println("[ERREUR] Colonne inconnue : " + e.getMessage());
+    }
+  }
 }
 
 void Source() :
