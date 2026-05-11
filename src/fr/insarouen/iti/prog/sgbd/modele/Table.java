@@ -44,11 +44,13 @@ public class Table {
    
     /**
      * Construction d'une table vide 
+     * Lors de la creation dune table en fait CREATE NOM (aat1,att2,att3)
      * @param nom tab a creer
      * @param attibuts contient la liste d'attributs à ajouter
      */
 
-    public Table(String nom, List<Attribut> attributs){
+    public Table(String nom, List<Attribut> attributs){ // en se basant sur lexemple de crearion d'une table de fichier exemple du moodle
+    
         this.nom=nom;
         this.attributs = new ArrayList<>(attributs);
         this.tuples = new ArrayList<>();
@@ -58,7 +60,7 @@ public class Table {
      * Permet linsertion de tuple dans une table 
      * @param t Tuple qui contient des valeur d'attribut
      */
-    public void insererTuple(Tuple t){
+    public void insererTuple(Tuple t){ // a verifier que les valeur inserer sont bien les attribut demander 
         this.tuples.add(t);
     }
 

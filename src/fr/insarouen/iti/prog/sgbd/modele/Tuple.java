@@ -17,8 +17,9 @@ import java.util.stream.Collectors;
 
 public class Tuple {
     private List<Valeur> values;
+
     public Tuple(List<Valeur> values){
-        this.values=new ArrayList<>(values);
+        this.values=new ArrayList<>(values); 
 
     }
 
