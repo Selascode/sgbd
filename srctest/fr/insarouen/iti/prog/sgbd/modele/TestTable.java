@@ -240,6 +240,7 @@ public class TestTable {
         assertThat(result.getAttributs().get(1), equalTo(this.attributPuissance));
     }
 
+    
     @Test
     public void test_Table_projection_valeursTuples() throws AttributInconnuException {
         this.tableHeros.insererTuple(this.tuple1); // [1, "Batman", 100]
