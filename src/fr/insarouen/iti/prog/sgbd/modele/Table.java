@@ -147,7 +147,92 @@ public class Table {
     public String getNom() {
         return this.nom;
     }
+    
+    /***
+     * fait la projection sur les atrributs demandé
+     * @param nomsColonnes
+     * @return la table apres projection
+    
+    */
+    public Table projection(List<String> nomsColonnes) throws AttributInconnuException{
+        // On verifie que les colonnes existe
+        for (String nomCol : nomsColonnes) {
+        boolean existe = false;
+        for (Attribut attr : this.attributs) {
+            if (attr.getNom().equals(nomCol)) {
+                existe = true;
+                break;
+            }
+        }
+        if (!existe) {
+            throw new AttributInconnuException("Colonne " + nomCol + " inconnue");
+        }
+    }
+    // on garde les attribut demandés
+    List<Attribut> nouvelleAttributs = new ArrayList<>();
+    for (String nomCol : nomsColonnes) {
+        for (Attribut attr : this.attributs) {
+            if (attr.getNom().equals(nomCol)) {
+                nouvelleAttributs.add(attr);
+                break;
+            }
+        }
+    }
 
+    Table nouvelleTable = new Table(this.nom, nouvelleAttributs);
+
+    // on crée la nouvelle table
+    for (Tuple ancien : this.tuples) {
+        List<Valeur> nouvellesValeurs = new ArrayList<>();
+        for (String nomCol : nomsColonnes) {
+            for (int i = 0; i < this.attributs.size(); i++) {
+                if (this.attributs.get(i).getNom().equals(nomCol)) {
+                    nouvellesValeurs.add(ancien.getValeur(i));
+                    break;
+                }
+            }
+        }
+        nouvelleTable.insererTuple(new Tuple(nouvellesValeurs));
+    }
+
+    return nouvelleTable;
+}
+
+    public Table produitCartesien(Table autre){
+        // on crée une liste avec tout les attributs
+        List<Attribut> attributsFusion = new ArrayList<>(this.attributs);
+        attributsFusion.addAll(autre.attributs);
+        // on crée la nouvelle table
+        String nomproduitcartesien = this.nom + "_" + autre.nom;
+        Table newtable = new Table(nomproduitcartesien , attributsFusion);
+        // On parcours les tuples de la premiere table
+        for (Tuple tupleThis : this.tuples){
+            // On parcours les tuples de la deuxieme table
+            for(Tuple tupleAutre : autre.tuples){
+                //on crée la liste des attributs des deux tables
+                List<Valeur> valeursFusionnees = new ArrayList<>();
+                // on ajoute les valeurs du premier tuple
+                for (int i = 0; i < tupleThis.taille(); i++) {
+                    valeursFusionnees.add(tupleThis.getValeur(i));
+                }
+                // on ajouter les valeurs du second tuple
+                for (int i = 0; i < tupleAutre.taille(); i++) {
+                    valeursFusionnees.add(tupleAutre.getValeur(i));
+                }
+                // Créer et insérer le nouveau tuple
+                Tuple nouveauTuple = new Tuple(valeursFusionnees);
+                newtable.insererTuple(nouveauTuple);
+            }
+        }
+        return newtable;
+    }
+
+
+    
+
+
+
+    
     /**
      * Permet d'ajouter un attribut (unbe colonne) au schma de la table
      * @param a L'attribut à ajouter
