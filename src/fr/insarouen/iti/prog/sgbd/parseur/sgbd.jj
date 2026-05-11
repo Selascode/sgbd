@@ -353,10 +353,15 @@ void CommandeSelect() :
   }
 }
 
-void Source() :
-{}
+// Source : capture le nom de la table (et son alias optionnel) dans la liste
+void Source(List<String> sources) :
+{ 
+  Token t; 
+  Token a; 
+}
 {
-  <ID> ( (<AS>)? <ID> )?
+  t=<ID> { sources.add(t.image); }
+  ( (<AS>)? a=<ID> )?  // alias est  ignoré pour l'instant, sera fait quand y aura les jointures et autred
 }
 
 void CommandeExit() :
