@@ -8,9 +8,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 /**
  * Représentation de la base de données
- * Gestions de tables contenant des attributs et des tuples 
+ * Gestions de tables contenant des attributs et des tuples
  *
  * @author S.Maclean
  */
@@ -38,7 +39,7 @@ public class BaseDeDonnees {
      * @return true si la table existe, false sinon
      */
     public boolean tableExiste(String nom) {
-        return this.tables.containsKey(nom);
+        return this.tables.containsKey(nom.toLowerCase());
     }
 
     /**
@@ -51,7 +52,7 @@ public class BaseDeDonnees {
         if (this.tableExiste(t.getNom())) {
             throw new TableExistanteException(t.getNom());
         }
-        this.tables.put(t.getNom(), t);
+        this.tables.put(t.getNom().toLowerCase(), t);
     }
 
     /**
@@ -64,7 +65,7 @@ public class BaseDeDonnees {
         if (!this.tableExiste(nom)) {
             throw new TableInconnueException(nom);
         }
-        this.tables.remove(nom);
+        this.tables.remove(nom.toLowerCase());
     }
 
     /**
@@ -78,7 +79,7 @@ public class BaseDeDonnees {
         if (!this.tableExiste(nom)) {
             throw new TableInconnueException(nom);
         }
-        return this.tables.get(nom);
+        return this.tables.get(nom.toLowerCase());
     }
 
     /**
