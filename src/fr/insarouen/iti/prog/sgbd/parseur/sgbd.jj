@@ -11,8 +11,13 @@ import fr.insarouen.iti.prog.sgbd.modele.BaseDeDonnees;
 import fr.insarouen.iti.prog.sgbd.modele.Table;
 import fr.insarouen.iti.prog.sgbd.modele.Attribut;
 import fr.insarouen.iti.prog.sgbd.modele.Type;
+import fr.insarouen.iti.prog.sgbd.modele.Tuple;
+import fr.insarouen.iti.prog.sgbd.modele.Valeur;
+import fr.insarouen.iti.prog.sgbd.modele.ValeurInt;
+import fr.insarouen.iti.prog.sgbd.modele.ValeurVarchar;
 import fr.insarouen.iti.prog.sgbd.exceptions.TableExistanteException;
 import fr.insarouen.iti.prog.sgbd.exceptions.TableInconnueException;
+import fr.insarouen.iti.prog.sgbd.exceptions.AttributInconnuException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -187,18 +192,63 @@ void CommandeTables() :
   }
 }
 
-// Placeholder pour DML et Sélection (à implémenter)
+// INSERT INTO nom (col1, col2, ...) VALUES (val1, val2, ...)
 void CommandeInsert() :
-{}
 {
-  <INSERT> <INTO> <ID> <LPAREN> <ID> ( <COMMA> <ID> )* <RPAREN>
-  <VALUES> <LPAREN> Valeur() ( <COMMA> Valeur() )* <RPAREN>
+  Token nomTable;
+  Token nomCol;
+  List<String> colonnes = new ArrayList<>();
+  List<Valeur> valeurs  = new ArrayList<>();
+  Valeur val;
+}
+{
+  <INSERT> <INTO> nomTable=<ID>
+  <LPAREN> nomCol=<ID> { colonnes.add(nomCol.image); }
+    ( <COMMA> nomCol=<ID> { colonnes.add(nomCol.image); } )*
+  <RPAREN>
+  <VALUES>
+  <LPAREN> val=Valeur() { valeurs.add(val); }
+    ( <COMMA> val=Valeur() { valeurs.add(val); } )*
+  <RPAREN>
+  {
+    try {
+      Table table = db.getTable(nomTable.image);
+
+      // Vérification : même nombre de colonnes et de valeurs
+      if (colonnes.size() != valeurs.size()) {
+        System.err.println("[ERREUR] INSERT : nombre de colonnes et de valeurs différents");
+      } else {
+        // onstruire la liste ordonnée des valeurs dans l'ordre du schéma de la table
+        List<Valeur> tuppleValues = new ArrayList<>();
+        for (int i = 0; i < table.getAttributs().size(); i++) {
+          Attribut attr = table.getAttributs().get(i);
+          // Si la colonne est un SERIAL et qu'elle n'est pas dans la liste INSERT, on auto-incrémente
+          if (attr.getType() == Type.SERIAL && !colonnes.contains(attr.getNom())) {
+            tuppleValues.add(new ValeurInt(db.prochainSerial()));
+          } else {
+            int idx = colonnes.indexOf(attr.getNom());
+            if (idx == -1) {
+              System.err.println("[ERREUR] Colonne '" + attr.getNom() + "' manquante dans le INSERT");
+              return;
+            }
+            tuppleValues.add(valeurs.get(idx));
+          }
+        }
+        table.insererTuple(new Tuple(tuppleValues));
+        System.out.println("[OK] Ligne insérée dans '" + nomTable.image + "'");
+      }
+    } catch (TableInconnueException e) {
+      System.err.println("[ERREUR] " + e.getMessage());
+    }
+  }
 }
 
-void Valeur() :
-{}
+// Valeur : retourne l'objet Valeur Java correspondant (INT ou VARCHAR)
+Valeur Valeur() :
+{ Token t; }
 {
-  <NUMBER> | <STRING>
+  t=<NUMBER>  { return new ValeurInt(Integer.parseInt(t.image)); }
+| t=<STRING>  { return new ValeurVarchar(t.image.substring(1, t.image.length() - 1)); }
 }
 
 void CommandeDelete() :
@@ -224,7 +274,11 @@ void Source() :
 void CommandeExit() :
 {}
 {
-  <EXIT> | <QUIT>
+  ( <EXIT> | <QUIT> )
+  {
+    System.out.println("Au revoir");
+    System.exit(0);
+  }
 }
 
 // Expressions logiques
