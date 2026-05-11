@@ -24,6 +24,6 @@ public class GestionnaireStockage {
      */
     public BaseDeDonnees charger() {
         // A implementer lorsque le format de persistance sera choisi.
-        return new BaseDeDonnees();
+        return new BaseDeDonnees("laBaseDeDonnees");
     }
 }
