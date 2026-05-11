@@ -208,5 +208,126 @@ public class TestTable {
         aSupprimer.add(this.tuple2);
         this.tableHeros.supprimerTuples(aSupprimer);
     }
+    
+    // ============ TESTS PROJECTION ============
+    // projection sur une colonne
+    @Test
+    public void test_Table_projection_uneColonne() throws AttributInconnuException {
+        this.tableHeros.insererTuple(this.tuple1);
+        this.tableHeros.insererTuple(this.tuple2);
+
+        List<String> colonnes = new ArrayList<>();
+        colonnes.add("nom");
+
+        Table result = this.tableHeros.projection(colonnes);
+
+        assertThat(result.getAttributs().size(), equalTo(1));
+        assertThat(result.getAttributs().get(0), equalTo(this.attributNom));
+}
+    // projection sur plusieurs colonnes
+    @Test
+    public void test_Table_projection_plusieursColonnes() throws AttributInconnuException {
+        this.tableHeros.insererTuple(this.tuple1);
+
+        List<String> colonnes = new ArrayList<>();
+        colonnes.add("nom");
+        colonnes.add("puissance");
+
+        Table result = this.tableHeros.projection(colonnes);
+
+        assertThat(result.getAttributs().size(), equalTo(2));
+        assertThat(result.getAttributs().get(0), equalTo(this.attributNom));
+        assertThat(result.getAttributs().get(1), equalTo(this.attributPuissance));
+    }
+
+    @Test
+    public void test_Table_projection_valeursTuples() throws AttributInconnuException {
+        this.tableHeros.insererTuple(this.tuple1); // [1, "Batman", 100]
+        this.tableHeros.insererTuple(this.tuple2); // [2, "Robin", 60]
+
+        List<String> colonnes = new ArrayList<>();
+        colonnes.add("nom");
+        colonnes.add("puissance");
+
+        Table result = this.tableHeros.projection(colonnes);
+
+        // Vérification du nombre de tuples
+        assertThat(result.getTuples().size(), equalTo(2));
+
+        // Construction des tuples attendus
+        List<Valeur> valeursAttendues1 = new ArrayList<>();
+        valeursAttendues1.add(new ValeurVarchar("Batman"));
+        valeursAttendues1.add(new ValeurInt(100));
+        Tuple tupleAttendu1 = new Tuple(valeursAttendues1);
+
+        List<Valeur> valeursAttendues2 = new ArrayList<>();
+        valeursAttendues2.add(new ValeurVarchar("Robin"));
+        valeursAttendues2.add(new ValeurInt(60));
+        Tuple tupleAttendu2 = new Tuple(valeursAttendues2);
+
+        assertThat(result.getTuples().get(0), equalTo(tupleAttendu1));
+        assertThat(result.getTuples().get(1), equalTo(tupleAttendu2));
+    }
+
+    // Vérification de l'ordre des colonnes demandé
+    @Test
+    public void test_Table_projection_ordreColonnes() throws AttributInconnuException {
+        this.tableHeros.insererTuple(this.tuple1); // [1, "Batman", 100]
+
+        List<String> colonnes = new ArrayList<>();
+        colonnes.add("puissance"); // inversé par rapport à la table originale
+        colonnes.add("nom");
+
+        Table result = this.tableHeros.projection(colonnes);
+
+        assertThat(result.getAttributs().get(0), equalTo(this.attributPuissance));
+        assertThat(result.getAttributs().get(1), equalTo(this.attributNom));
+    }
+
+    // Projection sur toutes les colonnes
+    @Test
+    public void test_Table_projection_toutesLesColonnes() throws AttributInconnuException {
+        this.tableHeros.insererTuple(this.tuple1);
+
+        List<String> colonnes = new ArrayList<>();
+        colonnes.add("id");
+        colonnes.add("nom");
+        colonnes.add("puissance");
+
+        Table result = this.tableHeros.projection(colonnes);
+
+        assertThat(result.getAttributs().size(), equalTo(3));
+        assertThat(result.getTuples().size(), equalTo(1));
+    }
+
+    @Test
+    public void test_Table_projection_sanstuples() throws AttributInconnuException {
+        List<String> colonnes = new ArrayList<>();
+        colonnes.add("nom");
+
+        Table result = this.tableHeros.projection(colonnes);
+
+        assertThat(result.getAttributs().size(), equalTo(1));
+        assertThat(result.getTuples().size(), equalTo(0));
+    }
+
+    // Colonne inconnue — exception attendue
+    @Test(expected = AttributInconnuException.class)
+    public void test_Table_projection_colonneInconnue() throws AttributInconnuException {
+        List<String> colonnes = new ArrayList<>();
+        colonnes.add("inconnu");
+
+        this.tableHeros.projection(colonnes);
+    }
+
+    // Mélange colonne valide + invalide — exception attendue
+    @Test(expected = AttributInconnuException.class)
+    public void test_Table_projection_melange_valide_invalide() throws AttributInconnuException {
+        List<String> colonnes = new ArrayList<>();
+        colonnes.add("nom");
+        colonnes.add("colonne_inexistante");
+
+        this.tableHeros.projection(colonnes);
+    }
 
 }
