@@ -4,6 +4,7 @@ import fr.insarouen.iti.prog.sgbd.modele.Tuple;
 import fr.insarouen.iti.prog.sgbd.modele.Attribut;
 import fr.insarouen.iti.prog.sgbd.modele.Tuple;
 import fr.insarouen.iti.prog.sgbd.exceptions.AttributInconnuException;
+import fr.insarouen.iti.prog.sgbd.exceptions.TupleInconnuException;
 
 
 import java.util.ArrayList;
@@ -44,11 +45,12 @@ public class Table {
     /**
      * Construction d'une table vide 
      * @param nom tab a creer
+     * @param attibuts contient la liste d'attributs à ajouter
      */
 
-    public Table(String nom){
+    public Table(String nom, List<Attribut> attributs){
         this.nom=nom;
-        this.attributs = new ArrayList<>();
+        this.attributs = new ArrayList<>(attributs);
         this.tuples = new ArrayList<>();
     }
 
@@ -67,7 +69,16 @@ public class Table {
      * @param tuplesASupprimer
      * @return retourne le nb tuple qui sont supprimer 
      */
-    public int supprimerTuples(List<Tuple> tuplesASupprimer) {
+    public int supprimerTuples(List<Tuple> tuplesASupprimer) throws TupleInconnuException {
+
+        // Vérfications pour eviter de perdre de l'information
+
+        for (Tuple t : tuplesASupprimer){
+            if (!this.tuples.contains(t)){
+                throw new TupleInconnuException(String.format("Le tuple %s n'existe pas ", t.toString()));
+            }
+        }
+        // suppression 
         int tailleAvant = this.tuples.size();
         this.tuples.removeAll(tuplesASupprimer);
         int tailleApres = this.tuples.size();

@@ -4,6 +4,7 @@ import fr.insarouen.iti.prog.sgbd.modele.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -46,4 +47,12 @@ public class Tuple {
         return this.values.size();
     }
     
+     /**
+     * @return contenu d'un tuple (déboggage)
+     */
+    public String toString() {
+        return this.values.stream()
+        .map(v -> v.getDonnee().toString())
+        .collect(Collectors.joining(", ", "[", "]"));
+    }
 }
