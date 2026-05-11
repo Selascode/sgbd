@@ -131,7 +131,7 @@ void CommandeCreate() :
     Table t = new Table(nomTable.image, schema);
     try {
       db.creerTable(t);
-      System.out.println("Table ''" + nomTable.image + "' créée.");
+      System.out.println("Table '" + nomTable.image + "' créée.");
     } catch (TableExistanteException e) {
       System.err.println("[ERREUR] " + e.getMessage());
     }
