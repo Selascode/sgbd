@@ -1,7 +1,12 @@
 package fr.insarouen.iti.prog.sgbd.modele;
 
 import fr.insarouen.iti.prog.sgbd.modele.*;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.Objects;
+
 
 
 /**
@@ -14,8 +19,9 @@ import java.util.List;
 
 public class Tuple {
     private List<Valeur> values;
+
     public Tuple(List<Valeur> values){
-        this.values=values;
+        this.values=new ArrayList<>(values); 
 
     }
 
@@ -34,7 +40,7 @@ public class Tuple {
      * @return retourne les valeurs dun tuple
      */
     public List<Valeur> getValeurs(){
-        return this.values;
+        return Collections.unmodifiableList(this.values);// Comme dans le projet aventure pour avoir une copie pas une liste avec la même adresse
     }
 
     /**
@@ -43,9 +49,30 @@ public class Tuple {
     public int taille(){
         return this.values.size();
     }
-
-
-
-
     
+     /**
+     * @return contenu d'un tuple (déboggage)
+     */
+    public String toString() {
+        return this.values.stream()
+        .map(v -> v.getDonnee().toString())
+        .collect(Collectors.joining(", ", "[", "]"));
+    }
+    /**
+     * @return si deux tuples sont identiques
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Tuple)) return false;
+        Tuple autre = (Tuple) o;
+        return this.values.equals(autre.values); // délègue au equals de Valeur
+    }
+    /**
+     * @return le hashcode d'un tuple
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.values);
+    }
 }

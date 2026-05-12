@@ -75,4 +75,8 @@ public class ValeurInt extends Valeur {
     public int hashCode() {
         return Integer.hashCode(this.valeur);
     }
+
+    public String toString() {
+        return String.valueOf(this.valeur);
+    }
 }

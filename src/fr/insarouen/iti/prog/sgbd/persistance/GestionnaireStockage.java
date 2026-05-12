@@ -1,0 +1,29 @@
+package fr.insarouen.iti.prog.sgbd.persistance;
+
+import fr.insarouen.iti.prog.sgbd.modele.BaseDeDonnees;
+
+
+/**
+ * Gere la sauvegarde et le chargement de la base de donnees.
+ */
+public class GestionnaireStockage {
+
+    /**
+     * Sauvegarde l'etat courant de la base de donnees.
+     *
+     * @param db la base de donnees a sauvegarder
+     */
+    public void sauvegarder(BaseDeDonnees db) {
+        // A implementer lorsque le format de persistance sera choisi.
+    }
+
+    /**
+     * Charge une base de donnees sauvegardee.
+     *
+     * @return la base de donnees chargee
+     */
+    public BaseDeDonnees charger() {
+        // A implementer lorsque le format de persistance sera choisi.
+        return new BaseDeDonnees("laBaseDeDonnees");
+    }
+}

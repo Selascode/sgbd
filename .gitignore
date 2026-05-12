@@ -12,3 +12,13 @@ doc/
 .idea/
 out/
 .DS_Store
+src/fr/insarouen/iti/prog/sgbd/parseur/SGBDParser.java
+src/fr/insarouen/iti/prog/sgbd/parseur/ParseException.java
+src/fr/insarouen/iti/prog/sgbd/parseur/SGBDParserConstants.java
+.gitignore
+src/fr/insarouen/iti/prog/sgbd/parseur/SGBDParserTokenManager.java
+src/fr/insarouen/iti/prog/sgbd/parseur/SimpleCharStream.java
+.gitignore
+.gitignore
+src/fr/insarouen/iti/prog/sgbd/parseur/TokenMgrError.java
+src/fr/insarouen/iti/prog/sgbd/parseur/Token.java

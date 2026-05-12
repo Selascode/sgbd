@@ -7,16 +7,34 @@ PARSER_BEGIN(SGBDParser)
 
 package fr.insarouen.iti.prog.sgbd.parseur;
 
-// Importations futures pour interagir avec le modèle, avoir avec l'equipe
-// import fr.insarouen.iti.prog.sgbd.modele.*;
+import fr.insarouen.iti.prog.sgbd.modele.BaseDeDonnees;
+import fr.insarouen.iti.prog.sgbd.modele.Table;
+import fr.insarouen.iti.prog.sgbd.modele.Attribut;
+import fr.insarouen.iti.prog.sgbd.modele.Type;
+import fr.insarouen.iti.prog.sgbd.modele.Tuple;
+import fr.insarouen.iti.prog.sgbd.modele.Valeur;
+import fr.insarouen.iti.prog.sgbd.modele.ValeurInt;
+import fr.insarouen.iti.prog.sgbd.modele.ValeurVarchar;
+import fr.insarouen.iti.prog.sgbd.exceptions.TableExistanteException;
+import fr.insarouen.iti.prog.sgbd.exceptions.TableInconnueException;
+import fr.insarouen.iti.prog.sgbd.exceptions.AttributInconnuException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SGBDParser {
-  // si option sans ast comme le conseil le sujet
-  // private BaseDeDonnees db;
-  // autres methodes utiles et d'initialisation
-  // public void setDatabase(BaseDeDonnees database) {
-  //     this.db = database;
-  // }    
+
+  /** notre base de données sur laquelle le parseur va directement exécuter ses commandes
+   * au lieu de faire une nouvelle class Commandes et retourner des instances de celles ci
+   */
+  private BaseDeDonnees db;
+
+  /**
+   * Injecte la base de données cible
+   * Doit etre appelé avant toute command
+   */
+  public void setDatabase(BaseDeDonnees database) {
+      this.db = database;
+  }
 }
 
 PARSER_END(SGBDParser)
@@ -31,7 +49,7 @@ SKIP : {
 | "\t"
 | "\n"
 | "\r"
-| < "--" (~["\n","\r"])* ("\n"|"\r"|"\r\n")? > // Commentaires SQL débutant par --
+| < "--" (~["\n","\r"])* ("\n"|"\r"|"\r\n")? > // tpous les ommentaires SQL débutant par --
 }
 
 // Mots-clés du SQL
@@ -100,75 +118,260 @@ void Commande() :
   <SEMICOLON>
 }
 
-//  les commandes DDL
+// CREATE TABLE nom (col1 TYPE, col2 TYPE, ...)
 void CommandeCreate() :
-{}
 {
-  <CREATE> <TABLE> <ID> <LPAREN> Colonne() ( <COMMA> Colonne() )* <RPAREN>
+  Token nomTable;
+  List<Attribut> schema = new ArrayList<>();
+}
+{
+  <CREATE> <TABLE> nomTable=<ID>
+  <LPAREN> Colonne(schema) ( <COMMA> Colonne(schema) )* <RPAREN>
+  {
+    Table t = new Table(nomTable.image, schema);
+    try {
+      db.creerTable(t);
+      System.out.println("Table '" + nomTable.image + "' créée.");
+    } catch (TableExistanteException e) {
+      System.err.println("[ERREUR] " + e.getMessage());
+    }
+  }
 }
 
-void Colonne() :
-{}
+// Colonne : ajoute un Attribut dans le schema
+void Colonne(List<Attribut> schema) :
+{ 
+  Token nomCol; 
+  Type typeCol; 
+}
 {
-  <ID> Type()
+  nomCol=<ID> typeCol=Type()
+  { 
+    schema.add(new Attribut(nomCol.image, typeCol)); 
+  }
 }
 
-void Type() :
+// Type : retourne le Type Java correspondant au mot-clé lu
+Type Type() :
 {}
 {
-  <TYPE_INT> | <TYPE_SERIAL> | <TYPE_VARCHAR>
+  <TYPE_INT>     { return Type.INT; }
+| <TYPE_SERIAL>  { return Type.SERIAL; }
+| <TYPE_VARCHAR> { return Type.VARCHAR; }
 }
 
+// DROP TABLE nom
 void CommandeDrop() :
-{}
+{ 
+  Token nomTable; 
+}
 {
-  <DROP> <TABLE> <ID>
+  <DROP> <TABLE> nomTable=<ID>
+  {
+    try {
+      db.supprimerTable(nomTable.image);
+      System.out.println("Table '" + nomTable.image + "' supprimée.");
+    } catch (TableInconnueException e) {
+      System.err.println("[ERREUR] " + e.getMessage());
+    }
+  }
 }
 
+// TABLES : liste toutes les tables existantes
 void CommandeTables() :
 {}
 {
   <TABLES>
+  {
+    List<String> tables = db.listerTables();
+    if (tables.isEmpty()) {
+      System.out.println("(Aucune table)");
+    } else {
+      System.out.println("Tables : " + tables);
+    }
+  }
 }
 
-// Placeholder pour DML et Sélection (à implémenter)
+// INSERT INTO nom (col1, col2, ...) VALUES (val1, val2, ...)
 void CommandeInsert() :
-{}
 {
-  <INSERT> <INTO> <ID> <LPAREN> <ID> ( <COMMA> <ID> )* <RPAREN>
-  <VALUES> <LPAREN> Valeur() ( <COMMA> Valeur() )* <RPAREN>
+  Token nomTable;
+  Token nomCol;
+  List<String> colonnes = new ArrayList<>();
+  List<Valeur> valeurs  = new ArrayList<>();
+  Valeur val;
+}
+{
+  <INSERT> <INTO> nomTable=<ID>
+  <LPAREN> nomCol=<ID> { colonnes.add(nomCol.image); }
+    ( <COMMA> nomCol=<ID> { colonnes.add(nomCol.image); } )*
+  <RPAREN>
+  <VALUES>
+  <LPAREN> val=Valeur() { valeurs.add(val); }
+    ( <COMMA> val=Valeur() { valeurs.add(val); } )*
+  <RPAREN>
+  {
+    try {
+      Table table = db.getTable(nomTable.image);
+
+      // Vérification : même nombre de colonnes et de valeurs
+      if (colonnes.size() != valeurs.size()) {
+        System.err.println("[ERREUR] INSERT : nombre de colonnes et de valeurs différents");
+      } else {
+        // onstruire la liste ordonnée des valeurs dans l'ordre du schéma de la table
+        List<Valeur> tuppleValues = new ArrayList<>();
+        for (int i = 0; i < table.getAttributs().size(); i++) {
+          Attribut attr = table.getAttributs().get(i);
+          // Si la colonne est un SERIAL et qu'elle n'est pas dans la liste INSERT, on auto-incrémente
+          if (attr.getType() == Type.SERIAL && !colonnes.contains(attr.getNom())) {
+            tuppleValues.add(new ValeurInt(db.prochainSerial()));
+          } else {
+            int idx = colonnes.indexOf(attr.getNom());
+            if (idx == -1) {
+              System.err.println("[ERREUR] Colonne '" + attr.getNom() + "' manquante dans le INSERT");
+              return;
+            }
+            tuppleValues.add(valeurs.get(idx));
+          }
+        }
+        table.insererTuple(new Tuple(tuppleValues));
+        System.out.println("[OK] Ligne insérée dans '" + nomTable.image + "'");
+      }
+    } catch (TableInconnueException e) {
+      System.err.println("[ERREUR] " + e.getMessage());
+    }
+  }
 }
 
-void Valeur() :
-{}
+// Valeur : retourne l'objet Valeur Java correspondant (INT ou VARCHAR)
+Valeur Valeur() :
+{ Token t; }
 {
-  <NUMBER> | <STRING>
+  t=<NUMBER>  { return new ValeurInt(Integer.parseInt(t.image)); }
+| t=<STRING>  { return new ValeurVarchar(t.image.substring(1, t.image.length() - 1)); }
 }
 
+// DELETE FROM nom (WHERE condition)?
 void CommandeDelete() :
-{}
+{ 
+  Token nomTable; 
+}
 {
-  <DELETE> <FROM> <ID> ( <WHERE> ExpressionLogique() )?
+  <DELETE> <FROM> nomTable=<ID>
+  (
+    <WHERE> ExpressionLogique()
+    {
+      System.err.println("[INFO] DELETE avec WHERE non encore implémenté");
+    }
+  )?
+  {
+    // Si pas de WHERE : je supprime tous les tuples de la table
+    try {
+      Table table = db.getTable(nomTable.image);
+      int nb = table.supprimerTuples(new java.util.ArrayList<>(table.getTuples()));
+      System.out.println(nb + " ligne(s  ) supprimé(s) de '" + nomTable.image + "'");
+    } catch (TableInconnueException e) {
+      System.err.println("[ERREUR] " + e.getMessage());
+    } catch (fr.insarouen.iti.prog.sgbd.exceptions.TupleInconnuException e) {
+      System.err.println("[ERREUR] " + e.getMessage());
+    }
+  }
 }
 
+// SELECT cols FROM sources (WHERE condition)?
 void CommandeSelect() :
-{}
 {
-  <SELECT> ( <STAR> | <ID> ( <COMMA> <ID> )* )
-  <FROM> Source() ( <COMMA> Source() )*
-  ( <WHERE> ExpressionLogique() )?
+  Token col;
+  Token alias;
+  List<String> colonnes = new ArrayList<>();
+  Token source;
+  List<String> sources   = new ArrayList<>();
+  boolean etoile = false;
+}
+{
+  <SELECT>
+  (
+    <STAR> { etoile = true; }
+  |
+    col=<ID> { colonnes.add(col.image); }
+    ( <COMMA> col=<ID> { colonnes.add(col.image); } )*
+  )
+  <FROM> Source(sources) ( <COMMA> Source(sources) )*
+  (
+    <WHERE> ExpressionLogique()
+    {
+      // TODO : brancher quand ExpressionLogique + algèbre relationnelle seront implémentées
+      System.err.println("[INFO] SELECT avec WHERE non encore implémenté (en attente du module algèbre).");
+    }
+  )?
+  {
+    if (sources.size() > 1) {
+      System.err.println("[INFO] SELECT multi-tables (jointure) non encore implémenté.");
+      return;
+    }
+    try {
+      Table table = db.getTable(sources.get(0));
+      List<Attribut> schema = table.getAttributs();
+
+      // determiner les colonnes à afficher
+      List<Integer> indices = new ArrayList<>();
+      List<String> entetes  = new ArrayList<>();
+      if (etoile) {
+        for (int i = 0; i < schema.size(); i++) {
+          indices.add(i);
+          entetes.add(schema.get(i).getNom());
+        }
+      } else {
+        for (String nomCol : colonnes) {
+          entetes.add(nomCol);
+          indices.add(table.indexAttribut(nomCol));
+        }
+      }
+
+      // Affichage en tableau, bla bla bl
+      int largeur = 18;
+      StringBuilder ligne = new StringBuilder("|");
+      for (String e : entetes)
+        ligne.append(String.format(" %-" + (largeur-2) + "s |", e));
+      String separateur = "+" + ("-".repeat(largeur) + "+").repeat(entetes.size());
+      System.out.println(separateur);
+      System.out.println(ligne);
+      System.out.println(separateur);
+      for (Tuple t : table.getTuples()) {
+        StringBuilder row = new StringBuilder("|");
+        for (int idx : indices)
+          row.append(String.format(" %-" + (largeur-2) + "s |", t.getValeur(idx).getDonnee()));
+        System.out.println(row);
+      }
+      System.out.println(separateur);
+      System.out.println(table.getTuples().size() + " ligne(s).");
+    } catch (TableInconnueException e) {
+      System.err.println("[ERREUR] " + e.getMessage());
+    } catch (AttributInconnuException e) {
+      System.err.println("[ERREUR] Colonne inconnue : " + e.getMessage());
+    }
+  }
 }
 
-void Source() :
-{}
+// Source : capture le nom de la table (et son alias optionnel) dans la liste
+void Source(List<String> sources) :
+{ 
+  Token t; 
+  Token a; 
+}
 {
-  <ID> ( (<AS>)? <ID> )?
+  t=<ID> { sources.add(t.image); }
+  ( (<AS>)? a=<ID> )?  // alias est  ignoré pour l'instant, sera fait quand y aura les jointures et autred
 }
 
 void CommandeExit() :
 {}
 {
-  <EXIT> | <QUIT>
+  ( <EXIT> | <QUIT> )
+  {
+    System.out.println("Au revoir ;)");
+    System.exit(0);
+  }
 }
 
 // Expressions logiques
