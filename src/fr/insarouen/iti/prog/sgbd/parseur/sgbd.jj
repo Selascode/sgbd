@@ -18,6 +18,7 @@ import fr.insarouen.iti.prog.sgbd.modele.ValeurVarchar;
 import fr.insarouen.iti.prog.sgbd.exceptions.TableExistanteException;
 import fr.insarouen.iti.prog.sgbd.exceptions.TableInconnueException;
 import fr.insarouen.iti.prog.sgbd.exceptions.AttributInconnuException;
+import fr.insarouen.iti.prog.sgbd.exceptions.TupleInconnuException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,7 +96,7 @@ TOKEN : {
 TOKEN : {
   < NUMBER: (["0"-"9"])+ >
 | < STRING: "\"" (~["\""])* "\"" > // echaper les "
-| < ID: (["a"-"z", "A"-"Z"]) (["a"-"z", "A"-"Z", "0"-"9", "_", "."])* >
+| < ID: (["a"-"z","A"-"Z"]) (["a"-"z","A"-"Z","0"-"9","_","."])* >
 }
 
 /* =========================================================================
@@ -219,22 +220,22 @@ void CommandeInsert() :
         System.err.println("[ERREUR] INSERT : nombre de colonnes et de valeurs différents");
       } else {
         // onstruire la liste ordonnée des valeurs dans l'ordre du schéma de la table
-        List<Valeur> tuppleValues = new ArrayList<>();
+        List<Valeur> tupleValues = new ArrayList<>();
         for (int i = 0; i < table.getAttributs().size(); i++) {
           Attribut attr = table.getAttributs().get(i);
           // Si la colonne est un SERIAL et qu'elle n'est pas dans la liste INSERT, on auto-incrémente
           if (attr.getType() == Type.SERIAL && !colonnes.contains(attr.getNom())) {
-            tuppleValues.add(new ValeurInt(db.prochainSerial()));
+            tupleValues.add(new ValeurInt(db.prochainSerial()));
           } else {
             int idx = colonnes.indexOf(attr.getNom());
             if (idx == -1) {
               System.err.println("[ERREUR] Colonne '" + attr.getNom() + "' manquante dans le INSERT");
               return;
             }
-            tuppleValues.add(valeurs.get(idx));
+            tupleValues.add(valeurs.get(idx));
           }
         }
-        table.insererTuple(new Tuple(tuppleValues));
+        table.insererTuple(new Tuple(tupleValues));
         System.out.println("[OK] Ligne insérée dans '" + nomTable.image + "'");
       }
     } catch (TableInconnueException e) {
