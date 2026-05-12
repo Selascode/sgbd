@@ -1,7 +1,62 @@
 package fr.insarouen.iti.prog.sgbd.expressions;
 
+import fr.insarouen.iti.prog.sgbd.modele.Table;
+import fr.insarouen.iti.prog.sgbd.modele.Tuple;
+import fr.insarouen.iti.prog.sgbd.modele.Valeur;
+import fr.insarouen.iti.prog.sgbd.exceptions.*;
 public class ConditionSimple {
-    
+    private Operande operandegauche;
+    private Operande operandedroite;
+    private Operateur op;
+
+    public ConditionSimple(Operande gauche, Operateur op, Operande droite) {
+        this.operandegauche = gauche;
+        this.operandedroite = droite;
+        this.op = op;
+    }
+
+    // public boolean evaluercondition(Table t,Tuple tupl) throws AttributInconnuException {
+    //     Operande g= this.operandegauche;
+    //     Operande d =this.operandedroite;
+    //     int index_attribut= t.indexAttribut(g.evaluer(tupl, t).toString().substring(0));// ici le proble cest que mon evaluer retourneun type valeur et mon tostring retourne nom et type donc jai trouver sur javadoc ca qui peut maider pour prendre que le nom 
+    //     Valeur valeur=tupl.getValeur(index_attribut);
+    //     Operateur op=this.op;
+    //     char c=  Operateur.fromString(op);
+    //     switch ( op) {
+    //         case Operateur.fromString():
+                
+    //             break;
+        
+    //         default:
+    //             break;
+    //     }
+
+    // }
+
+
+        /**
+     * Évalue la condition simple sur un tuple donné.
+     * @param t le tuple sur lequel on évalue la condition
+     * @param table la table contenant les métadonnées des colonnes
+     * @return true si la condition est satisfaite, false sinon
+     * @throws AttributInconnuException si une colonne n'existe pas dans la table
+     */
+    public boolean evaluerCondition(Tuple t, Table table) throws AttributInconnuException,TypesIncompatibleException {
+        Valeur valG = this.operandegauche.evaluer(t, table);
+        Valeur valD = this.operandedroite.evaluer(t, table);
+        int cmp = valG.compareA(valD);
+        switch (this.op) {
+            case EGAL:
+                 return cmp == 0;
+            case SUP: 
+             return cmp > 0;
+            case INF:
+                return cmp < 0;
+            default: 
+            throw new IllegalStateException("Opérateur inconnu");
+        }
+    }
+
 
     
 }
