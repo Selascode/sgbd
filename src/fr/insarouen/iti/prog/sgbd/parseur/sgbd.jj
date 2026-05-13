@@ -15,15 +15,14 @@ import fr.insarouen.iti.prog.sgbd.modele.Tuple;
 import fr.insarouen.iti.prog.sgbd.modele.Valeur;
 import fr.insarouen.iti.prog.sgbd.modele.ValeurInt;
 import fr.insarouen.iti.prog.sgbd.modele.ValeurVarchar;
-import fr.insarouen.iti.prog.sgbd.exceptions.TableExistanteException;
-import fr.insarouen.iti.prog.sgbd.exceptions.TableInconnueException;
-import fr.insarouen.iti.prog.sgbd.exceptions.AttributInconnuException;
-import fr.insarouen.iti.prog.sgbd.exceptions.TupleInconnuException;
 import fr.insarouen.iti.prog.sgbd.expressions.ConditionSimple;
 import fr.insarouen.iti.prog.sgbd.expressions.ExpressionLogique;
 import fr.insarouen.iti.prog.sgbd.expressions.Operande;
 import fr.insarouen.iti.prog.sgbd.expressions.Operateur;
 import fr.insarouen.iti.prog.sgbd.expressions.OperateurLogique;
+import fr.insarouen.iti.prog.sgbd.exceptions.TableExistanteException;
+import fr.insarouen.iti.prog.sgbd.exceptions.TableInconnueException;
+import fr.insarouen.iti.prog.sgbd.exceptions.AttributInconnuException;
 import fr.insarouen.iti.prog.sgbd.exceptions.TypesIncompatibleException;
 import java.util.ArrayList;
 import java.util.List;
@@ -102,7 +101,7 @@ TOKEN : {
 TOKEN : {
   < NUMBER: (["0"-"9"])+ >
 | < STRING: "\"" (~["\""])* "\"" > // echaper les "
-| < ID: (["a"-"z","A"-"Z"]) (["a"-"z","A"-"Z","0"-"9","_","."])* >
+| < ID: (["a"-"z", "A"-"Z"]) (["a"-"z", "A"-"Z", "0"-"9", "_", "."])* >
 }
 
 /* =========================================================================
@@ -138,7 +137,7 @@ void CommandeCreate() :
     Table t = new Table(nomTable.image, schema);
     try {
       db.creerTable(t);
-      System.out.println("Table '" + nomTable.image + "' créée.");
+      System.out.println("\nTable '" + nomTable.image + "' créée.");
     } catch (TableExistanteException e) {
       System.err.println("[ERREUR] " + e.getMessage());
     }
@@ -226,23 +225,23 @@ void CommandeInsert() :
         System.err.println("[ERREUR] INSERT : nombre de colonnes et de valeurs différents");
       } else {
         // onstruire la liste ordonnée des valeurs dans l'ordre du schéma de la table
-        List<Valeur> tupleValues = new ArrayList<>();
+        List<Valeur> tuppleValues = new ArrayList<>();
         List<Attribut> schemaTable = new ArrayList<>(table.getAttributs());
         for (int i = 0; i < schemaTable.size(); i++) {
           Attribut attr = schemaTable.get(i);
           // Si la colonne est un SERIAL et qu'elle n'est pas dans la liste INSERT, on auto-incrémente
           if (attr.getType() == Type.SERIAL && !colonnes.contains(attr.getNom())) {
-            tupleValues.add(new ValeurInt(db.prochainSerial()));
+            tuppleValues.add(new ValeurInt(db.prochainSerial()));
           } else {
             int idx = colonnes.indexOf(attr.getNom());
             if (idx == -1) {
               System.err.println("[ERREUR] Colonne '" + attr.getNom() + "' manquante dans le INSERT");
               return;
             }
-            tupleValues.add(valeurs.get(idx));
+            tuppleValues.add(valeurs.get(idx));
           }
         }
-        table.insererTuple(new Tuple(tupleValues));
+        table.insererTuple(new Tuple(tuppleValues));
         System.out.println("[OK] Ligne insérée dans '" + nomTable.image + "'");
       }
     } catch (TableInconnueException e) {
@@ -322,23 +321,23 @@ void CommandeSelect() :
   )?
   {
     try {
-      //:roduit cartésien si plusieurs sources
+      // 1. Produit cartésien si plusieurs sources
       Table tableResultat = db.getTable(sources.get(0));
       for (int i = 1; i < sources.size(); i++) {
           tableResultat = tableResultat.produitCartesien(db.getTable(sources.get(i)));
       }
 
-      // sélection (WHERE) on délègue à l'algèbre relationnelle de Table
+      // 2. Sélection (WHERE) -> on délègue à l'algèbre relationnelle de Table
       if (expr != null) {
           tableResultat = tableResultat.selection(expr);
       }
 
-      // projection
+      // 3. Projection
       if (!etoile) {
           tableResultat = tableResultat.projection(colonnes);
       }
 
-      // affichage en tableau
+      // 4. Affichage en tableau
       List<Attribut> schema = new ArrayList<>(tableResultat.getAttributs());
       int largeur = 18;
       StringBuilder ligne = new StringBuilder("|");

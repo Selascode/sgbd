@@ -25,7 +25,6 @@ public class Interpreteur {
             while (true) {
                 try {
                     parser.Commande();
-                    System.out.println("[OK] Commande syntaxiquement correcte !");
                 } catch (ParseException e) {
                     System.out.println("[ERREUR] Erreur de syntaxe : " + e.getMessage());
                     break;
