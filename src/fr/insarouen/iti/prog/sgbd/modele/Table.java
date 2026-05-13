@@ -198,9 +198,16 @@ public class Table {
 }
 
     public Table produitCartesien(Table autre){
-        // on crée une liste avec tout les attributs
-        List<Attribut> attributsFusion = new ArrayList<>(this.attributs);
-        attributsFusion.addAll(autre.attributs);
+        // on crée une liste avec tous les attributs préfixés par leur nom de table
+        List<Attribut> attributsFusion = new ArrayList<>();
+        for (Attribut attr : this.attributs) {
+            String nouveauNom = attr.getNom().contains(".") ? attr.getNom() : this.nom + "." + attr.getNom();
+            attributsFusion.add(new Attribut(nouveauNom, attr.getType()));
+        }
+        for (Attribut attr : autre.attributs) {
+            String nouveauNom = attr.getNom().contains(".") ? attr.getNom() : autre.nom + "." + attr.getNom();
+            attributsFusion.add(new Attribut(nouveauNom, attr.getType()));
+        }
         // on crée la nouvelle table
         String nomproduitcartesien = this.nom + "_" + autre.nom;
         Table newtable = new Table(nomproduitcartesien , attributsFusion);
