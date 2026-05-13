@@ -70,12 +70,12 @@ public class TestTable {
 
     @Test
     public void test_Table_getAttributs_taille() {
-        assertThat(this.tableHeros.getAttributs().size(), equalTo(3));
+        assertThat(new java.util.ArrayList<>(this.tableHeros.getAttributs()).size(), equalTo(3));
     }
 
     @Test
     public void test_Table_getAttributs(){
-        List<Attribut> attributs = this.tableHeros.getAttributs();
+        List<Attribut> attributs = new java.util.ArrayList<>(this.tableHeros.getAttributs());
         assertThat(attributs.get(0), equalTo(this.attributId));
         assertThat(attributs.get(1), equalTo(this.attributNom));
         assertThat(attributs.get(2), equalTo(this.attributPuissance));
@@ -88,7 +88,7 @@ public class TestTable {
 
     @Test(expected = UnsupportedOperationException.class)
     public void test_Table_getAttributs_immutable() {
-        this.tableHeros.getAttributs().add(new Attribut("test", Type.INT));
+        new java.util.ArrayList<>(this.tableHeros.getAttributs()).add(new Attribut("test", Type.INT));
     }
 
         @Test
@@ -222,7 +222,7 @@ public class TestTable {
         Table result = this.tableHeros.projection(colonnes);
 
         assertThat(result.getAttributs().size(), equalTo(1));
-        assertThat(result.getAttributs().get(0), equalTo(this.attributNom));
+        assertThat(new java.util.ArrayList<>(result.getAttributs()).get(0), equalTo(this.attributNom));
 }
     // projection sur plusieurs colonnes
     @Test
@@ -236,8 +236,8 @@ public class TestTable {
         Table result = this.tableHeros.projection(colonnes);
 
         assertThat(result.getAttributs().size(), equalTo(2));
-        assertThat(result.getAttributs().get(0), equalTo(this.attributNom));
-        assertThat(result.getAttributs().get(1), equalTo(this.attributPuissance));
+        assertThat(new java.util.ArrayList<>(result.getAttributs()).get(0), equalTo(this.attributNom));
+        assertThat(new java.util.ArrayList<>(result.getAttributs()).get(1), equalTo(this.attributPuissance));
     }
 
 
@@ -281,8 +281,8 @@ public class TestTable {
 
         Table result = this.tableHeros.projection(colonnes);
 
-        assertThat(result.getAttributs().get(0), equalTo(this.attributPuissance));
-        assertThat(result.getAttributs().get(1), equalTo(this.attributNom));
+        assertThat(new java.util.ArrayList<>(result.getAttributs()).get(0), equalTo(this.attributPuissance));
+        assertThat(new java.util.ArrayList<>(result.getAttributs()).get(1), equalTo(this.attributNom));
     }
 
     // Projection sur toutes les colonnes
@@ -461,7 +461,7 @@ public class TestTable {
 
         // La table originale ne doit pas avoir été modifiée
         assertThat(this.tableHeros.getTuples().size(), equalTo(2));
-        assertThat(this.tableHeros.getAttributs().size(), equalTo(3));
+        assertThat(new java.util.ArrayList<>(this.tableHeros.getAttributs()).size(), equalTo(3));
     }
 
 }
