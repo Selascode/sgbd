@@ -3,9 +3,14 @@ package fr.insarouen.iti.prog.sgbd.modele;
 import fr.insarouen.iti.prog.sgbd.exceptions.AttributInconnuException;
 import fr.insarouen.iti.prog.sgbd.exceptions.TupleInconnuException;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Représente une table au sein d'une base de données relationnelle.
@@ -22,7 +27,8 @@ public class Table {
      */
 
     private String nom;
-    private List<Attribut> attributs;
+    
+    private LinkedHashSet<Attribut> attributs;
     private List<Tuple> tuples;
 
     /**
@@ -35,7 +41,7 @@ public class Table {
     public Table(String nom, List<Attribut> attributs) { // en se basant sur lexemple de crearion d'une table de fichier exemple du moodle
     
         this.nom = nom;
-        this.attributs = new ArrayList<>(attributs);
+        this.attributs = new LinkedHashSet<>(attributs);
         this.tuples = new ArrayList<>();
     }
 
@@ -100,8 +106,8 @@ public class Table {
      * @return l 'attribut dont il ya le nom nom
      */
 
-    public List<Attribut> getAttributs() {
-        return Collections.unmodifiableList(this.attributs);
+    public Set<Attribut> getAttributs() {
+        return Collections.unmodifiableSet(this.attributs);
     }
 
     /***
@@ -124,15 +130,11 @@ public class Table {
      * @param nom
      * @return lindice de l'attribut possedent le nom nom
      */
-    public int indexAttribut(String nom) throws AttributInconnuException {// la encore il faut ajouter lexceprion ou
-                                                                          // bien throws car en utilise un methode qui
-                                                                          // est get attribut qui peut lever une
-                                                                          // exceprion
-        Attribut att = this.getAttribut(nom);
-        int index = this.attributs.indexOf(att);// dapres la java doc (Returns the index of the first occurrence of the
-                                                // specified element in this list, or -1 if this list does not contain
-                                                // the elemen)
-        return index;
+    public int indexAttribut(String nom) throws AttributInconnuException {
+        Attribut att = this.getAttribut(nom); // lève AttributInconnuException si absent
+
+        List<Attribut> liste = new ArrayList<>(this.attributs);
+        return liste.indexOf(att);
     }
 
     /**
@@ -149,47 +151,50 @@ public class Table {
     
     */
     public Table projection(List<String> nomsColonnes) throws AttributInconnuException{
-        // On verifie que les colonnes existe
-        for (String nomCol : nomsColonnes) {
-        boolean existe = false;
-        for (Attribut attr : this.attributs) {
-            if (attr.getNom().equals(nomCol)) {
-                existe = true;
-                break;
+            // On verifie que les colonnes existe
+            for (String nomCol : nomsColonnes) {
+            boolean existe = false;
+            for (Attribut attr : this.attributs) {
+                if (attr.getNom().equals(nomCol)) {
+                    existe = true;
+                    break;
+                }
+            }
+            if (!existe) {
+                throw new AttributInconnuException("Colonne " + nomCol + " inconnue");
             }
         }
-        if (!existe) {
-            throw new AttributInconnuException("Colonne " + nomCol + " inconnue");
-        }
-    }
-    // on garde les attribut demandés
-    List<Attribut> nouvelleAttributs = new ArrayList<>();
-    for (String nomCol : nomsColonnes) {
-        for (Attribut attr : this.attributs) {
-            if (attr.getNom().equals(nomCol)) {
-                nouvelleAttributs.add(attr);
-                break;
-            }
-        }
-    }
-
-    Table nouvelleTable = new Table(this.nom, nouvelleAttributs);
-
-    // on crée la nouvelle table
-    for (Tuple ancien : this.tuples) {
-        List<Valeur> nouvellesValeurs = new ArrayList<>();
+        // on garde les attribut demandés
+        List<Attribut> nouvelleAttributs = new ArrayList<>();
         for (String nomCol : nomsColonnes) {
-            for (int i = 0; i < this.attributs.size(); i++) {
-                if (this.attributs.get(i).getNom().equals(nomCol)) {
-                    nouvellesValeurs.add(ancien.getValeur(i));
+            for (Attribut attr : this.attributs) {
+                if (attr.getNom().equals(nomCol)) {
+                    nouvelleAttributs.add(attr);
                     break;
                 }
             }
         }
-        nouvelleTable.insererTuple(new Tuple(nouvellesValeurs));
-    }
 
-    return nouvelleTable;
+        Table nouvelleTable = new Table(this.nom, nouvelleAttributs);
+
+       
+        List<Attribut> liste = new ArrayList<>(this.attributs);
+
+
+        for (Tuple ancien : this.tuples) {
+            List<Valeur> nouvellesValeurs = new ArrayList<>();
+            for (String nomCol : nomsColonnes) {
+                for (int i = 0; i < this.attributs.size(); i++) {
+                    if (liste.get(i).getNom().equals(nomCol)) {
+                        nouvellesValeurs.add(ancien.getValeur(i));
+                        break;
+                    }
+                }
+            }
+            nouvelleTable.insererTuple(new Tuple(nouvellesValeurs));
+        }
+
+        return nouvelleTable;
 }
 
     public Table produitCartesien(Table autre){
