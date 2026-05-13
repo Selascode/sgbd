@@ -225,17 +225,17 @@ void CommandeInsert() :
           Attribut attr = table.getAttributs().get(i);
           // Si la colonne est un SERIAL et qu'elle n'est pas dans la liste INSERT, on auto-incrémente
           if (attr.getType() == Type.SERIAL && !colonnes.contains(attr.getNom())) {
-            tupleValues.add(new ValeurInt(db.prochainSerial()));
+            tuppleValues.add(new ValeurInt(db.prochainSerial()));
           } else {
             int idx = colonnes.indexOf(attr.getNom());
             if (idx == -1) {
               System.err.println("[ERREUR] Colonne '" + attr.getNom() + "' manquante dans le INSERT");
               return;
             }
-            tupleValues.add(valeurs.get(idx));
+            tuppleValues.add(valeurs.get(idx));
           }
         }
-        table.insererTuple(new Tuple(tupleValues));
+        table.insererTuple(new Tuple(tuppleValues));
         System.out.println("[OK] Ligne insérée dans '" + nomTable.image + "'");
       }
     } catch (TableInconnueException e) {
