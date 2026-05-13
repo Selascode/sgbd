@@ -351,10 +351,10 @@ public class TestTable {
         Table result = this.tableHeros.produitCartesien(tableVilles);
 
         assertThat(result.getAttributs().size(), equalTo(4)); // id, nom, puissance, ville
-        assertThat(result.getAttributs().get(0), equalTo(this.attributId));
-        assertThat(result.getAttributs().get(1), equalTo(this.attributNom));
-        assertThat(result.getAttributs().get(2), equalTo(this.attributPuissance));
-        assertThat(result.getAttributs().get(3), equalTo(attributVille));
+        assertThat(new java.util.ArrayList<>(result.getAttributs()).get(0), equalTo(new Attribut("heros_de_l_insa.id", Type.SERIAL)));
+        assertThat(new java.util.ArrayList<>(result.getAttributs()).get(1), equalTo(new Attribut("heros_de_l_insa.nom", Type.VARCHAR)));
+        assertThat(new java.util.ArrayList<>(result.getAttributs()).get(2), equalTo(new Attribut("heros_de_l_insa.puissance", Type.INT)));
+        assertThat(new java.util.ArrayList<>(result.getAttributs()).get(3), equalTo(new Attribut("villes.ville", Type.VARCHAR)));
     }
 
     // Vérification du nombre de tuples (n × m)
