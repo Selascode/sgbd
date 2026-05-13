@@ -226,11 +226,21 @@ public class Table {
         return newtable;
     }
 
-
+    /**
+     * pplique une sélection sur les tuples en conservant uniquement ceux qui vérifient la condit iob
+     * @param conditiob L'expression logique à évaluer
+     * @return une nouvelle table contenant les tuples filtrés
+     */
+    public Table selection(ExpressionLogique condition) throws AttributInconnuException, TypesIncompatibleException {
+        Table nouvelleTable = new Table(this.nom, new ArrayList<>(this.attributs));
+        for (Tuple t : this.tuples) {
+            if (condition.evaluerexpression(t, this)) {
+                nouvelleTable.insererTuple(t);
+            }
+        }
+        return nouvelleTable;
+    }
     
-
-
-
     
     /**
      * Permet d'ajouter un attribut (unbe colonne) au schma de la table
