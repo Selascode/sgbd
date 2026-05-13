@@ -88,7 +88,7 @@ public class TestTable {
 
     @Test(expected = UnsupportedOperationException.class)
     public void test_Table_getAttributs_immutable() {
-        new java.util.ArrayList<>(this.tableHeros.getAttributs()).add(new Attribut("test", Type.INT));
+        this.tableHeros.getAttributs().add(new Attribut("test", Type.INT));
     }
 
         @Test
