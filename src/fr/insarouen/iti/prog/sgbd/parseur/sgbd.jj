@@ -288,6 +288,7 @@ void CommandeSelect() :
   Token source;
   List<String> sources   = new ArrayList<>();
   boolean etoile = false;
+  ExpressionLogique expr = null;
 }
 {
   <SELECT>
@@ -299,57 +300,53 @@ void CommandeSelect() :
   )
   <FROM> Source(sources) ( <COMMA> Source(sources) )*
   (
-    <WHERE> ExpressionLogique()
-    {
-      // TODO : brancher quand ExpressionLogique + algèbre relationnelle seront implémentées
-      System.err.println("[INFO] SELECT avec WHERE non encore implémenté (en attente du module algèbre).");
-    }
+    <WHERE> expr=ExpressionLogique()
   )?
   {
-    if (sources.size() > 1) {
-      System.err.println("[INFO] SELECT multi-tables (jointure) non encore implémenté.");
-      return;
-    }
     try {
-      Table table = db.getTable(sources.get(0));
-      List<Attribut> schema = table.getAttributs();
-
-      // determiner les colonnes à afficher
-      List<Integer> indices = new ArrayList<>();
-      List<String> entetes  = new ArrayList<>();
-      if (etoile) {
-        for (int i = 0; i < schema.size(); i++) {
-          indices.add(i);
-          entetes.add(schema.get(i).getNom());
-        }
-      } else {
-        for (String nomCol : colonnes) {
-          entetes.add(nomCol);
-          indices.add(table.indexAttribut(nomCol));
-        }
+      //:roduit cartésien si plusieurs sources
+      Table tableResultat = db.getTable(sources.get(0));
+      for (int i = 1; i < sources.size(); i++) {
+          tableResultat = tableResultat.produitCartesien(db.getTable(sources.get(i)));
       }
 
-      // Affichage en tableau, bla bla bl
+      // sélection (WHERE) on délègue à l'algèbre relationnelle de Table
+      if (expr != null) {
+          tableResultat = tableResultat.selection(expr);
+      }
+
+      // projection
+      if (!etoile) {
+          tableResultat = tableResultat.projection(colonnes);
+      }
+
+      // affichage en tableau
+      List<Attribut> schema = new ArrayList<>(tableResultat.getAttributs());
       int largeur = 18;
       StringBuilder ligne = new StringBuilder("|");
-      for (String e : entetes)
-        ligne.append(String.format(" %-" + (largeur-2) + "s |", e));
-      String separateur = "+" + ("-".repeat(largeur) + "+").repeat(entetes.size());
+      for (Attribut attr : schema) {
+        ligne.append(String.format(" %-" + (largeur-2) + "s |", attr.getNom()));
+      }
+      String separateur = "+" + ("-".repeat(largeur) + "+").repeat(schema.size());
       System.out.println(separateur);
       System.out.println(ligne);
       System.out.println(separateur);
-      for (Tuple t : table.getTuples()) {
+      for (Tuple t : tableResultat.getTuples()) {
         StringBuilder row = new StringBuilder("|");
-        for (int idx : indices)
-          row.append(String.format(" %-" + (largeur-2) + "s |", t.getValeur(idx).getDonnee()));
+        for (int i = 0; i < schema.size(); i++) {
+          row.append(String.format(" %-" + (largeur-2) + "s |", t.getValeur(i).getDonnee()));
+        }
         System.out.println(row);
       }
       System.out.println(separateur);
-      System.out.println(table.getTuples().size() + " ligne(s).");
+      System.out.println(tableResultat.getTuples().size() + " ligne(s).");
+
     } catch (TableInconnueException e) {
       System.err.println("[ERREUR] " + e.getMessage());
     } catch (AttributInconnuException e) {
       System.err.println("[ERREUR] Colonne inconnue : " + e.getMessage());
+    } catch (TypesIncompatibleException e) {
+      System.err.println("[ERREUR] Type incompatible dans le WHERE : " + e.getMessage());
     }
   }
 }
