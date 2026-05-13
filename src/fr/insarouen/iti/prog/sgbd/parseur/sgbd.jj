@@ -19,6 +19,12 @@ import fr.insarouen.iti.prog.sgbd.exceptions.TableExistanteException;
 import fr.insarouen.iti.prog.sgbd.exceptions.TableInconnueException;
 import fr.insarouen.iti.prog.sgbd.exceptions.AttributInconnuException;
 import fr.insarouen.iti.prog.sgbd.exceptions.TupleInconnuException;
+import fr.insarouen.iti.prog.sgbd.expressions.ConditionSimple;
+import fr.insarouen.iti.prog.sgbd.expressions.ExpressionLogique;
+import fr.insarouen.iti.prog.sgbd.expressions.Operande;
+import fr.insarouen.iti.prog.sgbd.expressions.Operateur;
+import fr.insarouen.iti.prog.sgbd.expressions.OperateurLogique;
+import fr.insarouen.iti.prog.sgbd.exceptions.TypesIncompatibleException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -221,21 +227,22 @@ void CommandeInsert() :
       } else {
         // onstruire la liste ordonnée des valeurs dans l'ordre du schéma de la table
         List<Valeur> tupleValues = new ArrayList<>();
-        for (int i = 0; i < table.getAttributs().size(); i++) {
-          Attribut attr = table.getAttributs().get(i);
+        List<Attribut> schemaTable = new ArrayList<>(table.getAttributs());
+        for (int i = 0; i < schemaTable.size(); i++) {
+          Attribut attr = schemaTable.get(i);
           // Si la colonne est un SERIAL et qu'elle n'est pas dans la liste INSERT, on auto-incrémente
           if (attr.getType() == Type.SERIAL && !colonnes.contains(attr.getNom())) {
-            tuppleValues.add(new ValeurInt(db.prochainSerial()));
+            tupleValues.add(new ValeurInt(db.prochainSerial()));
           } else {
             int idx = colonnes.indexOf(attr.getNom());
             if (idx == -1) {
               System.err.println("[ERREUR] Colonne '" + attr.getNom() + "' manquante dans le INSERT");
               return;
             }
-            tuppleValues.add(valeurs.get(idx));
+            tupleValues.add(valeurs.get(idx));
           }
         }
-        table.insererTuple(new Tuple(tuppleValues));
+        table.insererTuple(new Tuple(tupleValues));
         System.out.println("[OK] Ligne insérée dans '" + nomTable.image + "'");
       }
     } catch (TableInconnueException e) {
@@ -256,25 +263,36 @@ Valeur Valeur() :
 void CommandeDelete() :
 { 
   Token nomTable; 
+  ExpressionLogique expr = null;
 }
 {
   <DELETE> <FROM> nomTable=<ID>
   (
-    <WHERE> ExpressionLogique()
-    {
-      System.err.println("[INFO] DELETE avec WHERE non encore implémenté");
-    }
+    <WHERE> expr=ExpressionLogique()
   )?
   {
-    // Si pas de WHERE : je supprime tous les tuples de la table
     try {
       Table table = db.getTable(nomTable.image);
-      int nb = table.supprimerTuples(new java.util.ArrayList<>(table.getTuples()));
-      System.out.println(nb + " ligne(s  ) supprimé(s) de '" + nomTable.image + "'");
+      List<Tuple> aSupprimer = new ArrayList<>();
+
+      // Filtrer les tuples avec l'expression logique s'il y a un WHERE
+      if (expr != null) {
+          Table filtre = table.selection(expr);
+          aSupprimer.addAll(filtre.getTuples());
+      } else {
+          aSupprimer.addAll(table.getTuples());
+      }
+
+      int nb = table.supprimerTuples(aSupprimer);
+      System.out.println(nb + " ligne(s) supprimée(s) de '" + nomTable.image + "'.");
     } catch (TableInconnueException e) {
       System.err.println("[ERREUR] " + e.getMessage());
     } catch (fr.insarouen.iti.prog.sgbd.exceptions.TupleInconnuException e) {
       System.err.println("[ERREUR] " + e.getMessage());
+    } catch (AttributInconnuException e) {
+      System.err.println("[ERREUR] Attribut inconnu dans le WHERE : " + e.getMessage());
+    } catch (TypesIncompatibleException e) {
+      System.err.println("[ERREUR] Type incompatible dans le WHERE : " + e.getMessage());
     }
   }
 }
@@ -373,14 +391,51 @@ void CommandeExit() :
 }
 
 // Expressions logiques
-void ExpressionLogique() :
-{}
+ExpressionLogique ExpressionLogique() :
 {
-  ConditionSimple() ( (<AND> | <OR>) ConditionSimple() )*
+  ExpressionLogique expr = new ExpressionLogique();
+  ConditionSimple cond;
+  Token opLogique;
+}
+{
+  cond=ConditionSimple() { expr.ajouterCondition(cond); }
+  (
+    ( opLogique=<AND> | opLogique=<OR> )
+    cond=ConditionSimple()
+    {
+      if (opLogique.image.equalsIgnoreCase("AND")) {
+          expr.ajouterOperateurEtCondition(OperateurLogique.AND, cond);
+      } else {
+          expr.ajouterOperateurEtCondition(OperateurLogique.OR, cond);
+      }
+    }
+  )*
+  { return expr; }
 }
 
-void ConditionSimple() :
-{}
+ConditionSimple ConditionSimple() :
 {
-  <ID> ( <OP_EQ> | <OP_GT> | <OP_LT> ) ( Valeur() | <ID> )
+  Operande gauche;
+  Operande droite;
+  Token op;
+}
+{
+  gauche=Operande()
+  ( op=<OP_EQ> | op=<OP_GT> | op=<OP_LT> )
+  droite=Operande()
+  {
+    return new ConditionSimple(gauche, Operateur.fromString(op.image), droite);
+  }
+}
+
+Operande Operande() :
+{ Token t; Valeur v; }
+{
+  // C'est soit un nom de colonne, soit une valeur littérale
+  t=<ID> { return new Operande(t.image); }
+|
+  v=Valeur() {
+      if (v instanceof ValeurInt) return new Operande((ValeurInt) v);
+      else return new Operande((ValeurVarchar) v);
+  }
 }

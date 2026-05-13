@@ -3,6 +3,8 @@ package fr.insarouen.iti.prog.sgbd.modele;
 import fr.insarouen.iti.prog.sgbd.exceptions.AttributInconnuException;
 import fr.insarouen.iti.prog.sgbd.exceptions.TupleInconnuException;
 
+import fr.insarouen.iti.prog.sgbd.exceptions.TypesIncompatibleException;
+import fr.insarouen.iti.prog.sgbd.expressions.ExpressionLogique;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
