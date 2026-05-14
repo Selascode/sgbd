@@ -1,8 +1,9 @@
 package fr.insarouen.iti.prog.sgbd.modele;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public record Attribut(String nom, Type type) {
+public record Attribut(String nom, Type type)  implements Serializable{
         /**
          * Chaque attribut est caracterise par un nom et un type.
          * Ces élements de l'attributs ne peuvent être vide ou null

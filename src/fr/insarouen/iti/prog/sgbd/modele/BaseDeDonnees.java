@@ -4,11 +4,9 @@ import fr.insarouen.iti.prog.sgbd.exceptions.TableExistanteException;
 import fr.insarouen.iti.prog.sgbd.exceptions.TableInconnueException;
 import fr.insarouen.iti.prog.sgbd.exceptions.AttributInconnuException;
 import fr.insarouen.iti.prog.sgbd.exceptions.TypesIncompatibleException;
-import fr.insarouen.iti.prog.sgbd.modele.Attribut;
-import fr.insarouen.iti.prog.sgbd.modele.Table;
-import fr.insarouen.iti.prog.sgbd.modele.Valeur;
 import fr.insarouen.iti.prog.sgbd.expressions.ExpressionLogique;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,7 +23,7 @@ import java.util.stream.Stream;
  *
  * @author S.Maclean
  */
-public class BaseDeDonnees {
+public class BaseDeDonnees implements Serializable{
 
     private String nom;
     private Map<String, Table> tables;

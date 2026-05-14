@@ -10,7 +10,6 @@ import java.util.Collection;
  * Contrat pour charger l'état d'une partie (monde + conditions de fin).
  */
 public interface Lecteur {
-
     /**
      * Renvoie la base chargé depuis la source de données.
      *
@@ -18,6 +17,8 @@ public interface Lecteur {
      * @throws IOException            En cas d'erreur de lecture.
      * @throws ClassNotFoundException Si une classe sérialisée est introuvable.
      */
-    public abstract BaseDeDonnees getBaseDeDonnees() throws IOException, ClassNotFoundException;
+    public BaseDeDonnees lire(String chemin) throws IOException, ClassNotFoundException;
+
+
 
 }

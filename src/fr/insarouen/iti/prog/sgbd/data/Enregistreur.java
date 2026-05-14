@@ -1,7 +1,8 @@
 package fr.insarouen.iti.prog.sgbd.data;
 
-import fr.insarouen.iti.prog.sgbd.modele.BaseDeDonnees; 
+import fr.insarouen.iti.prog.sgbd.modele.BaseDeDonnees;
 
+import java.io.IOException;
 import java.util.Collection;
 
 /**
@@ -12,8 +13,8 @@ public interface Enregistreur{
     /**
      * Sauvegarde le monde et les conditions de fin.
      *
-     * @param bd              La base de données
-     * @throws Throwable En cas d'erreur d'écriture.
+     * @param bd La base de données
+     * @throws IOException En cas d'erreur d'écriture.
      */
-    public abstract void enregistrer(BaseDeDonnees bd) throws Throwable;
+    public abstract void enregistrer(BaseDeDonnees bd, String chemin) throws IOException;
 }

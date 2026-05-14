@@ -1,5 +1,6 @@
 package fr.insarouen.iti.prog.sgbd.modele;
 
+import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
  */
 
 
-public class Tuple extends AbstractList<Valeur> {
+public class Tuple extends AbstractList<Valeur> implements Serializable {
     private final List<Valeur> values;// Un tuple ne change pas 
 
     public Tuple(List<Valeur> values){

@@ -1,6 +1,7 @@
 package fr.insarouen.iti.prog.sgbd.data;
 import fr.insarouen.iti.prog.sgbd.modele.BaseDeDonnees;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
@@ -33,7 +34,8 @@ public class EnregistreurSerialisation  implements Enregistreur{
      * @throws IOException En cas d'erreur d'écriture.
      */
     @Override
-    public void enregistrer(BaseDeDonnees bd)throws IOException{
+    public void enregistrer(BaseDeDonnees bd, String chemin )throws IOException{
+        ObjectOutputStream oos = new ObjectOutputStream( new FileOutputStream(chemin))
         this.oos.writeObject(bd);
     }
 

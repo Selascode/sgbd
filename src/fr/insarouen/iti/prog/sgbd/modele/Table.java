@@ -5,6 +5,8 @@ import fr.insarouen.iti.prog.sgbd.exceptions.TupleInconnuException;
 
 import fr.insarouen.iti.prog.sgbd.exceptions.TypesIncompatibleException;
 import fr.insarouen.iti.prog.sgbd.expressions.ExpressionLogique;
+
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +25,7 @@ import java.util.Set;
  * @author Elakoum
  * @version 1.0
  */
-public class Table {
+public class Table implements Serializable {
     /*
      * Le nom de la table dans une base de donne ce nom la est unique pour chaque
      * table
