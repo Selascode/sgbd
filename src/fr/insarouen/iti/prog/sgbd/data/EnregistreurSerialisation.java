@@ -35,8 +35,8 @@ public class EnregistreurSerialisation  implements Enregistreur{
      */
     @Override
     public void enregistrer(BaseDeDonnees bd, String chemin )throws IOException{
-        ObjectOutputStream oos = new ObjectOutputStream( new FileOutputStream(chemin))
-        this.oos.writeObject(bd);
+        ObjectOutputStream oos = new ObjectOutputStream( new FileOutputStream(chemin));
+        oos.writeObject(bd);
     }
 
     

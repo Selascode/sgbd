@@ -30,7 +30,7 @@ public class LecteurSerialisation implements Lecteur {
      */
     @Override
     public BaseDeDonnees lire(String chemin) throws IOException, ClassNotFoundException{
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(chemin))
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(chemin));
         return (BaseDeDonnees) ois.readObject(); 
     };
 
