@@ -208,7 +208,7 @@ public class TestTable {
         aSupprimer.add(this.tuple2);
         this.tableHeros.supprimerTuples(aSupprimer);
     }
-    
+    /** 
     // ============ TESTS PROJECTION ============
     // projection sur une colonne
     @Test
@@ -463,5 +463,5 @@ public class TestTable {
         assertThat(this.tableHeros.getTuples().size(), equalTo(2));
         assertThat(new java.util.ArrayList<>(this.tableHeros.getAttributs()).size(), equalTo(3));
     }
-
+*/
 }

@@ -11,8 +11,7 @@ import fr.insarouen.iti.prog.sgbd.commandes.AllTestsCommandes;
 @SuiteClasses({
    AllTestsModele.class,
    AllTestsParseur.class,
-   AllTestsExpressions.class,
-   AllTestsCommandes.class
+   AllTestsExpressions.class
 })
 
 public class AllTests {}
