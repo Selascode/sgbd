@@ -1,24 +1,26 @@
 package fr.insarouen.iti.prog.sgbd.modele;
 
-import fr.insarouen.iti.prog.sgbd.modele.*;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.Objects;
-
+import java.util.stream.Collectors;
 
 
 /**
  * Représente un tuple (une ligne de données) dans une table.
- * Un tuple est une collection ordonnée de valeurs correspondant aux attributs de la table.
- * * @author Elakoum
- * @version 1.0
+ * Implémente List<Valeur> via AbstractList pour un accès direct
+ * aux valeurs avec toutes les opérations de liste standard. 
+ * Sans avoir à tout redéfinir
+ * 
+ * * @author Elakoum & Maclean
+ * @version 2.0
  */
 
 
-public class Tuple {
-    private List<Valeur> values;
+public class Tuple extends AbstractList<Valeur> {
+    private final List<Valeur> values;// Un tuple ne change pas 
 
     public Tuple(List<Valeur> values){
         this.values=new ArrayList<>(values); 
@@ -27,28 +29,24 @@ public class Tuple {
 
     /**
      * 
-     * @param index indice de l'attribut  dans la table 
+     * @param index indice de l'attribut dans la table 
      * @return la valeur associer a cette attribut
      */
-    public Valeur getValeur(int index_attribut){
-
-        return this.values.get(index_attribut);//selon la java doc (Returns the element at the specified position in this list.)
-
-    }
-    /**
-     * 
-     * @return retourne les valeurs dun tuple
-     */
-    public List<Valeur> getValeurs(){
-        return Collections.unmodifiableList(this.values);// Comme dans le projet aventure pour avoir une copie pas une liste avec la même adresse
+    @Override
+    public Valeur get(int index) {
+        return this.values.get(index);
     }
 
+
     /**
-     * @return retourn la taille dun tuple
+     * Retourne le nombre de valeurs dans ce tuple.
+     *
      */
-    public int taille(){
+    @Override
+    public int size() {
         return this.values.size();
     }
+
     
      /**
      * @return contenu d'un tuple (déboggage)

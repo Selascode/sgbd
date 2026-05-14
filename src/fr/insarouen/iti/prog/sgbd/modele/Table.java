@@ -97,7 +97,7 @@ public class Table {
                                                                              // exuste ou pas
 
         for (Attribut att : this.attributs) {
-            if (nom.equals(att.getNom())) {
+            if (nom.equals(att.nom())) {
                 return att;
             }
         }
@@ -120,7 +120,7 @@ public class Table {
      */
     public boolean attributExiste(String nom) {
         for (Attribut att : this.attributs) {
-            if (nom.equals(att.getNom())) {
+            if (nom.equals(att.nom())) {
                 return true;
             }
         }

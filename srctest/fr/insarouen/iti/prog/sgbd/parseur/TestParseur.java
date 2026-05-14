@@ -74,9 +74,9 @@ public class TestParseur {
     public void test_parseur_createTable_schema_types() throws Exception {
         executer("CREATE TABLE heroes (id SERIAL, nom VARCHAR, puissance INT);");
         Table t = db.getTable("heroes");
-        assertThat(new java.util.ArrayList<>(t.getAttributs()).get(0).getType(), equalTo(Type.SERIAL));
-        assertThat(new java.util.ArrayList<>(t.getAttributs()).get(1).getType(), equalTo(Type.VARCHAR));
-        assertThat(new java.util.ArrayList<>(t.getAttributs()).get(2).getType(), equalTo(Type.INT));
+        assertThat(new java.util.ArrayList<>(t.getAttributs()).get(0).type(), equalTo(Type.SERIAL));
+        assertThat(new java.util.ArrayList<>(t.getAttributs()).get(1).type(), equalTo(Type.VARCHAR));
+        assertThat(new java.util.ArrayList<>(t.getAttributs()).get(2).type(), equalTo(Type.INT));
     }
 
     @Test
@@ -130,8 +130,8 @@ public class TestParseur {
         executer("INSERT INTO heroes (nom) VALUES (\"Robin\");");
         Table t = db.getTable("heroes");
         // id doit être 1 pour Batman et 2 pour Robin
-        assertThat((Integer) t.getTuples().get(0).getValeur(0).getDonnee(), equalTo(1));
-        assertThat((Integer) t.getTuples().get(1).getValeur(0).getDonnee(), equalTo(2));
+        assertThat((Integer) t.getTuples().get(0).get(0).getDonnee(), equalTo(1));
+        assertThat((Integer) t.getTuples().get(1).get(0).getDonnee(), equalTo(2));
     }
 
     @Test
@@ -139,7 +139,7 @@ public class TestParseur {
         executer("CREATE TABLE heroes (id SERIAL, nom VARCHAR);");
         executer("INSERT INTO heroes (nom) VALUES (\"Batgirl\");");
         Table t = db.getTable("heroes");
-        assertThat(t.getTuples().get(0).getValeur(1).getDonnee(), equalTo("Batgirl"));
+        assertThat(t.getTuples().get(0).get(1).getDonnee(), equalTo("Batgirl"));
     }
 
     @Test

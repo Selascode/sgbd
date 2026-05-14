@@ -162,7 +162,7 @@ public class BaseDeDonnees {
         for (Tuple ancien : table.getTuples()){
             List<Valeur> valeurs = new ArrayList<>(); 
             for(int idx : indices){
-                valeurs.add(ancien.getValeur(idx)); 
+                valeurs.add(ancien.get(idx)); 
             }
             res.insererTuple(new Tuple(valeurs));
         }
@@ -173,12 +173,12 @@ public class BaseDeDonnees {
         // on crée une liste avec tous les attributs préfixés par leur nom de table
         List<Attribut> attributsFusion = new ArrayList<>();
         for (Attribut attr : source.getAttributs()) {
-            String nouveauNom = attr.getNom().contains(".") ? attr.getNom() : source.getNom() + "." + attr.getNom();
-            attributsFusion.add(new Attribut(nouveauNom, attr.getType()));
+            String nouveauNom = attr.nom().contains(".") ? attr.nom() : source.getNom() + "." + attr.nom();
+            attributsFusion.add(new Attribut(nouveauNom, attr.type()));
         }
         for (Attribut attr : destination.getAttributs()) {
-            String nouveauNom = attr.getNom().contains(".") ? attr.getNom() : destination.getNom() + "." + attr.getNom();
-            attributsFusion.add(new Attribut(nouveauNom, attr.getType()));
+            String nouveauNom = attr.nom().contains(".") ? attr.nom() : destination.getNom() + "." + attr.nom();
+            attributsFusion.add(new Attribut(nouveauNom, attr.type()));
         }
         // on crée la nouvelle table
         String nomproduitcartesien = source.getNom() + "_" + destination.getNom();
@@ -190,12 +190,12 @@ public class BaseDeDonnees {
                 //on crée la liste des attributs des deux tables
                 List<Valeur> valeursFusionnees = new ArrayList<>();
                 // on ajoute les valeurs du premier tuple
-                for (int i = 0; i < tupleSource.taille(); i++) {
-                    valeursFusionnees.add(tupleSource.getValeur(i));
+                for (int i = 0; i < tupleSource.size(); i++) {
+                    valeursFusionnees.add(tupleSource.get(i));
                 }
                 // on ajouter les valeurs du second tuple
-                for (int i = 0; i < tupledestination.taille(); i++) {
-                    valeursFusionnees.add(tupledestination.getValeur(i));
+                for (int i = 0; i < tupledestination.size(); i++) {
+                    valeursFusionnees.add(tupledestination.get(i));
                 }
                 // Créer et insérer le nouveau tuple
                 Tuple nouveauTuple = new Tuple(valeursFusionnees);

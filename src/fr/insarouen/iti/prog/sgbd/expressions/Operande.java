@@ -41,7 +41,7 @@ public class Operande {
         switch (type) {
             case COLONNE:
                 int index = table.indexAttribut(nomColonne);
-                return tuple.getValeur(index);
+                return tuple.get(index);
             case NOMBRE:
                 return valeurNombre;
             case CHAINE:

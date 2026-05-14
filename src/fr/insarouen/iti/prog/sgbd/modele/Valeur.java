@@ -2,10 +2,12 @@ package fr.insarouen.iti.prog.sgbd.modele;
 
 import fr.insarouen.iti.prog.sgbd.modele.Type;
 
+import java.io.Serializable;
+
 import fr.insarouen.iti.prog.sgbd.exceptions.TypesIncompatibleException;
 
 
-public abstract class Valeur {
+public abstract class Valeur implements Serializable{
     
     private Type type; 
 

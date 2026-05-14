@@ -230,12 +230,12 @@ void CommandeInsert() :
         for (int i = 0; i < schemaTable.size(); i++) {
           Attribut attr = schemaTable.get(i);
           // Si la colonne est un SERIAL et qu'elle n'est pas dans la liste INSERT, on auto-incrémente
-          if (attr.getType() == Type.SERIAL && !colonnes.contains(attr.getNom())) {
+          if (attr.type() == Type.SERIAL && !colonnes.contains(attr.nom())) {
             tuppleValues.add(new ValeurInt(db.prochainSerial()));
           } else {
-            int idx = colonnes.indexOf(attr.getNom());
+            int idx = colonnes.indexOf(attr.nom());
             if (idx == -1) {
-              System.err.println("[ERREUR] Colonne '" + attr.getNom() + "' manquante dans le INSERT");
+              System.err.println("[ERREUR] Colonne '" + attr.nom() + "' manquante dans le INSERT");
               return;
             }
             tuppleValues.add(valeurs.get(idx));
@@ -342,7 +342,7 @@ void CommandeSelect() :
       int largeur = 18;
       StringBuilder ligne = new StringBuilder("|");
       for (Attribut attr : schema) {
-        ligne.append(String.format(" %-" + (largeur-2) + "s |", attr.getNom()));
+        ligne.append(String.format(" %-" + (largeur-2) + "s |", attr.nom()));
       }
       String separateur = "+" + ("-".repeat(largeur) + "+").repeat(schema.size());
       System.out.println(separateur);
@@ -351,7 +351,7 @@ void CommandeSelect() :
       for (Tuple t : tableResultat.getTuples()) {
         StringBuilder row = new StringBuilder("|");
         for (int i = 0; i < schema.size(); i++) {
-          row.append(String.format(" %-" + (largeur-2) + "s |", t.getValeur(i).getDonnee()));
+          row.append(String.format(" %-" + (largeur-2) + "s |", t.get(i).getDonnee()));
         }
         System.out.println(row);
       }

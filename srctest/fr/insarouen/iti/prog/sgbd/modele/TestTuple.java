@@ -44,27 +44,27 @@ public class TestTuple {
 
     @Test
     public void test_Tuple_Int_index0() {
-        assertThat(this.tupleInt.getValeur(0), equalTo(new ValeurInt(5)));
+        assertThat(this.tupleInt.get(0), equalTo(new ValeurInt(5)));
     }
     
     @Test
     public void test_Tuple_Int_index1() {
-        assertThat(this.tupleInt.getValeur(1), equalTo(new ValeurInt(10)));
+        assertThat(this.tupleInt.get(1), equalTo(new ValeurInt(10)));
     }
     
     @Test
     public void test_Tuple_Int_index2() {
-        assertThat(this.tupleInt.getValeur(2), equalTo(new ValeurInt(15)));
+        assertThat(this.tupleInt.get(2), equalTo(new ValeurInt(15)));
     }
     
     @Test
-    public void test_Tuple_Int_taille() {
-        assertThat(this.tupleInt.taille(), equalTo(3));
+    public void test_Tuple_Int_size() {
+        assertThat(this.tupleInt.size(), equalTo(3));
     }
     
     @Test
     public void test_Tuple_Int_getValeurs() {
-        List<Valeur> valeurs = this.tupleInt.getValeurs();
+        List<Valeur> valeurs = this.tupleInt;
         assertThat(valeurs.size(), equalTo(3));
         assertThat(valeurs.get(0), equalTo(new ValeurInt(5)));
         assertThat(valeurs.get(1), equalTo(new ValeurInt(10)));
@@ -73,27 +73,27 @@ public class TestTuple {
 
     @Test
     public void test_Tuple_Varchar_index0() {
-        assertThat(this.tupleVarchar.getValeur(0), equalTo(new ValeurVarchar("Selasi")));
+        assertThat(this.tupleVarchar.get(0), equalTo(new ValeurVarchar("Selasi")));
     }
     
     @Test
     public void test_Tuple_Varchar_index1() {
-        assertThat(this.tupleVarchar.getValeur(1), equalTo(new ValeurVarchar("Youssef")));
+        assertThat(this.tupleVarchar.get(1), equalTo(new ValeurVarchar("Youssef")));
     }
     
     @Test
     public void test_Tuple_Varchar_index2() {
-        assertThat(this.tupleVarchar.getValeur(2), equalTo(new ValeurVarchar("Marwan")));
+        assertThat(this.tupleVarchar.get(2), equalTo(new ValeurVarchar("Marwan")));
     }
     
     @Test
-    public void test_Tuple_Varchar_taille() {
-        assertThat(this.tupleVarchar.taille(), equalTo(3));
+    public void test_Tuple_Varchar_size() {
+        assertThat(this.tupleVarchar.size(), equalTo(3));
     }
     
     @Test
     public void test_Tuple_Varchar_getValeurs() {
-        List<Valeur> valeurs = this.tupleVarchar.getValeurs();
+        List<Valeur> valeurs = this.tupleVarchar;
         assertThat(valeurs.size(), equalTo(3));
         assertThat(valeurs.get(0), equalTo(new ValeurVarchar("Selasi")));
         assertThat(valeurs.get(1), equalTo(new ValeurVarchar("Youssef")));
@@ -102,49 +102,49 @@ public class TestTuple {
 
         @Test
     public void test_Tuple_Mixte_getValeur_int() {
-        assertThat(this.tupleMixte.getValeur(0), equalTo(new ValeurInt(42)));
+        assertThat(this.tupleMixte.get(0), equalTo(new ValeurInt(42)));
     }
     
     @Test
     public void test_Tuple_Mixte_getValeur_varchar() {
-        assertThat(this.tupleMixte.getValeur(1), equalTo(new ValeurVarchar("Test")));
+        assertThat(this.tupleMixte.get(1), equalTo(new ValeurVarchar("Test")));
     }
     
     @Test
     public void test_Tuple_Mixte_getValeur_int2() {
-        assertThat(this.tupleMixte.getValeur(2), equalTo(new ValeurInt(100)));
+        assertThat(this.tupleMixte.get(2), equalTo(new ValeurInt(100)));
     }
     
     @Test
-    public void test_Tuple_Mixte_taille() {
-        assertThat(this.tupleMixte.taille(), equalTo(3));
+    public void test_Tuple_Mixte_size() {
+        assertThat(this.tupleMixte.size(), equalTo(3));
     }
     
     
     
     @Test
-    public void test_Tuple_Singleton_taille() {
-        assertThat(this.tupleSingleton.taille(), equalTo(1));
+    public void test_Tuple_Singleton_size() {
+        assertThat(this.tupleSingleton.size(), equalTo(1));
     }
     
     @Test
     public void test_Tuple_Singleton_getValeur() {
-        assertThat(this.tupleSingleton.getValeur(0), equalTo(new ValeurInt(7)));
+        assertThat(this.tupleSingleton.get(0), equalTo(new ValeurInt(7)));
     }
     
     @Test
-    public void test_Tuple_Vide_taille() {
-        assertThat(this.tupleVide.taille(), equalTo(0));
+    public void test_Tuple_Vide_size() {
+        assertThat(this.tupleVide.size(), equalTo(0));
     }
     
     @Test
     public void test_Tuple_Vide_getValeurs() {
-        assertThat(this.tupleVide.getValeurs().size(), equalTo(0));
+        assertThat(this.tupleVide.size(), equalTo(0));
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void test_Tuple_getValeurs_immuable(){
-        this.tupleInt.getValeurs().add(new ValeurInt(10)); 
+        this.tupleInt.add(new ValeurInt(10)); 
     }
 
     @Test
@@ -153,11 +153,11 @@ public class TestTuple {
         valeurs.add(new ValeurInt(1));
         Tuple t = new Tuple(valeurs);
         valeurs.add(new ValeurInt(2));
-        assertThat(t.taille(), equalTo(1));
+        assertThat(t.size(), equalTo(1));
     }
     @Test
     public void test_Tuple_Mixte_getValeurs() {
-        List<Valeur> valeurs = this.tupleMixte.getValeurs();
+        List<Valeur> valeurs = this.tupleMixte;
         assertThat(valeurs.size(), equalTo(3));
 }
 }

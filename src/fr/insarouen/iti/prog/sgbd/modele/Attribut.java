@@ -2,56 +2,21 @@ package fr.insarouen.iti.prog.sgbd.modele;
 
 import java.util.Objects;
 
-public class Attribut {
-    private String nom;
-    private Type type;
+public record Attribut(String nom, Type type) {
+        /**
+         * Chaque attribut est caracterise par un nom et un type.
+         * Ces élements de l'attributs ne peuvent être vide ou null
+         * 
+         * @param nom
+         * @param type
+         */
 
-
-    /**
-     * Chaque attribut est caracterise par un nom et un type
-     * @param nom
-     * @param type
-     */
-
-    public Attribut(String nom,Type type){
-        this.nom=nom;
-        this.type=type;
-
+     public Attribut {
+        if (nom == null || nom.isBlank())
+            throw new IllegalArgumentException("Le nom d'un attribut ne peut pas être vide");
+        if (type == null)
+            throw new IllegalArgumentException("Le type d'un attribut ne peut pas être null");
     }
-    /**
-     * 
-     * @return retourne le nom de l'attribut
-     */
-    public String getNom(){
-        return this.nom;
-    }
-
-    /**
-     * 
-     * @return retourne le type de l'attribut
-     */
-    public Type getType(){
-        return this.type;
-    }
-
-    /**
-     * 
-     * @return Verifie l'égalité avec nom et type
-     */
-    public boolean equals(Object obj){
-        if (this == obj) return true;
-        if(!(obj instanceof Attribut)) return false;
-        Attribut autre = (Attribut)obj;
-        return this.nom.equals(autre.nom) && this.type == autre.type; 
-    }
-
-     /**
-     * 
-     * @return retourne la représentation textuelle de l'attribut 
-     */
-    public int hashCode() {
-    return Objects.hash(this.nom, this.type);
-}
 
     /**
      * 
@@ -61,3 +26,4 @@ public class Attribut {
         return String.format("%s %s",this.nom, this.type);
     }
 }
+    

@@ -20,33 +20,33 @@ public class TestAttribut {
     }
 
     @Test
-    public void test_Attribut_getNom_INT(){
-        assertThat(this.attributInt.getNom(), equalTo("heure"));
+    public void test_Attribut_nom_INT(){
+        assertThat(this.attributInt.nom(), equalTo("heure"));
     }
 
     @Test
-    public void test_Attribut_getNom_VARCHAR(){
-        assertThat(this.attributVarchar.getNom(), equalTo("nom"));
+    public void test_Attribut_nom_VARCHAR(){
+        assertThat(this.attributVarchar.nom(), equalTo("nom"));
     }
 
     @Test
-    public void test_Attribut_getNom_SERIAL(){
-        assertThat(this.attributSerial.getNom(), equalTo("id"));
+    public void test_Attribut_nom_SERIAL(){
+        assertThat(this.attributSerial.nom(), equalTo("id"));
     }
 
     @Test
-    public void test_Attribut_getType_INT() {
-        assertThat(this.attributInt.getType(), equalTo(Type.INT));
+    public void test_Attribut_type_INT() {
+        assertThat(this.attributInt.type(), equalTo(Type.INT));
     }
  
     @Test
-    public void test_Attribut_getType_VARCHAR() {
-        assertThat(this.attributVarchar.getType(), equalTo(Type.VARCHAR));
+    public void test_Attribut_type_VARCHAR() {
+        assertThat(this.attributVarchar.type(), equalTo(Type.VARCHAR));
     }
  
     @Test
-    public void test_Attribut_getType_SERIAL() {
-        assertThat(this.attributSerial.getType(), equalTo(Type.SERIAL));
+    public void test_Attribut_type_SERIAL() {
+        assertThat(this.attributSerial.type(), equalTo(Type.SERIAL));
     }
     @Test
     public void test_Attribut_toString_INT() {
