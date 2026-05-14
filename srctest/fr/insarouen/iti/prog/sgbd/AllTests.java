@@ -5,7 +5,6 @@ import org.junit.runners.Suite.SuiteClasses;
 import fr.insarouen.iti.prog.sgbd.modele.AllTestsModele;
 import fr.insarouen.iti.prog.sgbd.parseur.AllTestsParseur;
 import fr.insarouen.iti.prog.sgbd.expressions.AllTestsExpressions;
-import fr.insarouen.iti.prog.sgbd.commandes.AllTestsCommandes;
 
 @RunWith(Suite.class)
 @SuiteClasses({

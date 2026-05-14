@@ -193,7 +193,7 @@ void CommandeTables() :
     if (tables.isEmpty()) {
       System.out.println("(Aucune table)");
     } else {
-      System.out.println("Tables : " + tables);
+      System.out.println("Tables : \n" + tables);
     }
   }
 }
@@ -276,7 +276,7 @@ void CommandeDelete() :
 
       // Filtrer les tuples avec l'expression logique s'il y a un WHERE
       if (expr != null) {
-          Table filtre = table.selection(expr);
+          Table filtre = db.selection(table,expr);
           aSupprimer.addAll(filtre.getTuples());
       } else {
           aSupprimer.addAll(table.getTuples());
@@ -324,17 +324,17 @@ void CommandeSelect() :
       // 1. Produit cartésien si plusieurs sources
       Table tableResultat = db.getTable(sources.get(0));
       for (int i = 1; i < sources.size(); i++) {
-          tableResultat = tableResultat.produitCartesien(db.getTable(sources.get(i)));
+          tableResultat = db.produitCartesien(tableResultat,db.getTable(sources.get(i)));
       }
 
       // 2. Sélection (WHERE) -> on délègue à l'algèbre relationnelle de Table
       if (expr != null) {
-          tableResultat = tableResultat.selection(expr);
+          tableResultat = db.selection(tableResultat,expr);
       }
 
       // 3. Projection
       if (!etoile) {
-          tableResultat = tableResultat.projection(colonnes);
+          tableResultat = db.projection(tableResultat,colonnes);
       }
 
       // 4. Affichage en tableau

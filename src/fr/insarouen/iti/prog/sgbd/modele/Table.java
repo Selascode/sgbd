@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,7 +41,7 @@ public class Table {
      * @param attibuts contient la liste d'attributs à ajouter
      */
 
-    public Table(String nom, List<Attribut> attributs) { // en se basant sur lexemple de crearion d'une table de fichier exemple du moodle
+    public Table(String nom, Collection<Attribut> attributs) { // en se basant sur lexemple de crearion d'une table de fichier exemple du moodle
     
         this.nom = nom;
         this.attributs = new LinkedHashSet<>(attributs);
@@ -145,111 +146,6 @@ public class Table {
     public String getNom() {
         return this.nom;
     }
-    
-    /***
-     * fait la projection sur les atrributs demandé
-     * @param nomsColonnes
-     * @return la table apres projection
-    
-    */
-    public Table projection(List<String> nomsColonnes) throws AttributInconnuException{
-            // On verifie que les colonnes existe
-            for (String nomCol : nomsColonnes) {
-            boolean existe = false;
-            for (Attribut attr : this.attributs) {
-                if (attr.getNom().equals(nomCol)) {
-                    existe = true;
-                    break;
-                }
-            }
-            if (!existe) {
-                throw new AttributInconnuException("Colonne " + nomCol + " inconnue");
-            }
-        }
-        // on garde les attribut demandés
-        List<Attribut> nouvelleAttributs = new ArrayList<>();
-        for (String nomCol : nomsColonnes) {
-            for (Attribut attr : this.attributs) {
-                if (attr.getNom().equals(nomCol)) {
-                    nouvelleAttributs.add(attr);
-                    break;
-                }
-            }
-        }
-
-        Table nouvelleTable = new Table(this.nom, nouvelleAttributs);
-
-       
-        List<Attribut> liste = new ArrayList<>(this.attributs);
-
-
-        for (Tuple ancien : this.tuples) {
-            List<Valeur> nouvellesValeurs = new ArrayList<>();
-            for (String nomCol : nomsColonnes) {
-                for (int i = 0; i < this.attributs.size(); i++) {
-                    if (liste.get(i).getNom().equals(nomCol)) {
-                        nouvellesValeurs.add(ancien.getValeur(i));
-                        break;
-                    }
-                }
-            }
-            nouvelleTable.insererTuple(new Tuple(nouvellesValeurs));
-        }
-
-        return nouvelleTable;
-}
-
-    public Table produitCartesien(Table autre){
-        // on crée une liste avec tous les attributs préfixés par leur nom de table
-        List<Attribut> attributsFusion = new ArrayList<>();
-        for (Attribut attr : this.attributs) {
-            String nouveauNom = attr.getNom().contains(".") ? attr.getNom() : this.nom + "." + attr.getNom();
-            attributsFusion.add(new Attribut(nouveauNom, attr.getType()));
-        }
-        for (Attribut attr : autre.attributs) {
-            String nouveauNom = attr.getNom().contains(".") ? attr.getNom() : autre.nom + "." + attr.getNom();
-            attributsFusion.add(new Attribut(nouveauNom, attr.getType()));
-        }
-        // on crée la nouvelle table
-        String nomproduitcartesien = this.nom + "_" + autre.nom;
-        Table newtable = new Table(nomproduitcartesien , attributsFusion);
-        // On parcours les tuples de la premiere table
-        for (Tuple tupleThis : this.tuples){
-            // On parcours les tuples de la deuxieme table
-            for(Tuple tupleAutre : autre.tuples){
-                //on crée la liste des attributs des deux tables
-                List<Valeur> valeursFusionnees = new ArrayList<>();
-                // on ajoute les valeurs du premier tuple
-                for (int i = 0; i < tupleThis.taille(); i++) {
-                    valeursFusionnees.add(tupleThis.getValeur(i));
-                }
-                // on ajouter les valeurs du second tuple
-                for (int i = 0; i < tupleAutre.taille(); i++) {
-                    valeursFusionnees.add(tupleAutre.getValeur(i));
-                }
-                // Créer et insérer le nouveau tuple
-                Tuple nouveauTuple = new Tuple(valeursFusionnees);
-                newtable.insererTuple(nouveauTuple);
-            }
-        }
-        return newtable;
-    }
-
-    /**
-     * pplique une sélection sur les tuples en conservant uniquement ceux qui vérifient la condit iob
-     * @param conditiob L'expression logique à évaluer
-     * @return une nouvelle table contenant les tuples filtrés
-     */
-    public Table selection(ExpressionLogique condition) throws AttributInconnuException, TypesIncompatibleException {
-        Table nouvelleTable = new Table(this.nom, new ArrayList<>(this.attributs));
-        for (Tuple t : this.tuples) {
-            if (condition.evaluerexpression(t, this)) {
-                nouvelleTable.insererTuple(t);
-            }
-        }
-        return nouvelleTable;
-    }
-    
     
     /**
      * Permet d'ajouter un attribut (unbe colonne) au schma de la table
