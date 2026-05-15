@@ -5,12 +5,14 @@ import org.junit.runners.Suite.SuiteClasses;
 import fr.insarouen.iti.prog.sgbd.modele.AllTestsModele;
 import fr.insarouen.iti.prog.sgbd.parseur.AllTestsParseur;
 import fr.insarouen.iti.prog.sgbd.expressions.AllTestsExpressions;
+import fr.insarouen.iti.prog.sgbd.data.AllTestsData;
 
 @RunWith(Suite.class)
 @SuiteClasses({
    AllTestsModele.class,
    AllTestsParseur.class,
-   AllTestsExpressions.class
+   AllTestsExpressions.class,
+   AllTestsData.class
 })
 
 public class AllTests {}
