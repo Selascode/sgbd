@@ -154,8 +154,8 @@ public class Table implements Serializable {
      * 
      * @param a L'attribut à ajouter
      */
-    public void addAttribut(Attribut a) {
-        this.attributs.add(a);
-    }
+    // public void addAttribut(Attribut a) {
+    //     this.attributs.add(a);
+    // }
 
 }
