@@ -15,30 +15,23 @@ import java.util.Collection;
  * </p>
  */
 public class EnregistreurSerialisation  implements Enregistreur{
-    /** Le flux de sortie vers lequel les objets sont sérialisés. */
-    private ObjectOutputStream oos;
 
     /**
-     * Construit l'enregistreur.
-     *
-     * @param oos Le flux de sortie de sérialisation.
-     */
-    public EnregistreurSerialisation(ObjectOutputStream oos) {
-        this.oos = oos; 
-    }
-    /**
-     * Sérialise le monde puis les conditions de fin dans le flux.
+     * Sérialise la BD dans le chemin.
+     * La méthode employé ferme automatiquement le fichier 
      *
      * @param bd          La base de donnée à sauvegarder.
      * @param conditionsDeFin Les conditions de fin à sauvegarder.
      * @throws IOException En cas d'erreur d'écriture.
      */
     @Override
-    public void enregistrer(BaseDeDonnees bd, String chemin )throws IOException{
-        ObjectOutputStream oos = new ObjectOutputStream( new FileOutputStream(chemin));
-        oos.writeObject(bd);
+    public void enregistrer(BaseDeDonnees bd, String chemin) throws IOException {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(chemin))) {
+            oos.writeObject(bd);
+        } catch (IOException e) {
+            System.err.println("Erreur le fichier n'a pas pu être ouvert: " + e.getMessage());
+            e.printStackTrace();
+        } 
     }
 
-    
-    
 }
