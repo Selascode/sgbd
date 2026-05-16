@@ -1,0 +1,61 @@
+
+% ============================================================
+%  3. Implémentation  (~3 pages)
+% ============================================================
+\section{Implémentation}
+
+\subsection{Structure des packages}
+Après avoir mis au point un ensemble l'ensemble des classes dans le diagramme de classe ci-dessus nous avons défini+.  l'architecture suivante : 
+\dirtree{%
+.1 src/.
+.2 modele/.
+.3 BaseDeDonnees.java
+.2 expressions/.
+.2 commandes/.
+.2 parseur/.
+.3 SGBD.jj
+.2 execution/.
+.2 persitance/.
+.2 exceptions/.
+}
+
+
+\subsection{Package Modèle}
+% Décrire les classes principales et leur rôle
+% Mettre un extrait de code pertinent (ex: prochainSerial)
+
+\begin{lstlisting}[caption=Compteur SERIAL global dans BaseDeDonnees]
+public int prochainSerial() {
+    this.compteurSerial++;
+    return this.compteurSerial;
+}
+\end{lstlisting}
+
+\subsection{Expressions logiques et évaluation WHERE}
+% Expliquer le fonctionnement de ConditionSimple.evaluer()
+% Mentionner le contexte ctx (Map<String, Tuple>)
+
+\subsection{Analyse syntaxique avec JavaCC}
+% Expliquer brièvement le rôle de JavaCC
+% Montrer un extrait de la grammaire .jj
+
+\begin{lstlisting}[language=bash, caption=Extrait de la grammaire SGBD.jj]
+// Exemple de regle syntaxique
+Commande parseCommande() :
+{}
+{
+    ( parseCreate() | parseInsert() | parseSelect()
+    | parseDrop()   | parseDelete() | parseTables()
+    | parseExit() )
+}
+\end{lstlisting}
+
+\subsection{Persistance}
+% Expliquer le mécanisme de sauvegarde SQL Dump
+% Montrer un exemple de fichier généré
+
+\begin{lstlisting}[caption=Exemple de fichier de sauvegarde mabase.sql]
+CREATE TABLE heroes (id SERIAL, nom VARCHAR, puissance INT);
+INSERT INTO heroes (id, nom, puissance) VALUES (1, "Batman", 100);
+INSERT INTO heroes (id, nom, puissance) VALUES (2, "Robin", 60);
+\end{lstlisting}

@@ -1,0 +1,32 @@
+% ============================================================
+%  1. Introduction  (~0.5 page)
+% ============================================================
+\section{Introduction}
+
+\subsection{Contexte}
+Ce projet a pour but de concevoir, à l'aide du langage \textbf{Java} 
+et du générateur d'analyseurs \textbf{JavaCC}, un Système de Gestion 
+de Base de Données (SGBD) relationnel. Il s'agit d'un interpréteur 
+de commandes SQL permettant à un utilisateur de créer et manipuler 
+une base de données directement depuis un terminal.
+
+Le système repose sur une architecture orientée objet structurée en 
+plusieurs packages : modèle de données, expressions logiques, 
+commandes, analyse syntaxique et exécution.
+
+\subsection{Fonctionnalités implémentées}
+Le SGBD supporte les commandes SQL suivantes :
+
+\begin{itemize}
+    \item \texttt{CREATE TABLE} - création d'une table avec ses attributs et leurs types
+    \item \texttt{INSERT INTO} -insertion d'un tuple dans une table
+    \item \texttt{SELECT} - consultation des données avec projection, 
+          filtrage (\texttt{WHERE}) et jointures multi-tables
+    \item \texttt{DELETE FROM} - suppression sélective de tuples selon une condition
+    \item \texttt{DROP TABLE} -suppression définitive d'une table
+    \item \texttt{TABLES} - affichage de la liste des tables existantes
+    \item \texttt{EXIT} / \texttt{QUIT} - fermeture de l'application 
+          avec sauvegarde automatique
+\end{itemize}
+
+Les types de données supportés sont \texttt{INT}, \texttt{VARCHAR} et \texttt{SERIAL} (entier auto-incrémenté).

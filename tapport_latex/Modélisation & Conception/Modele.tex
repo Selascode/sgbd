@@ -1,0 +1,42 @@
+% ============================================================
+%  2. Analyse et Conception  (~3 pages)
+% ============================================================
+\section{Analyse et Conception}
+
+\subsection{Modèle conceptuel}
+% Insérer le diagramme UML conceptuel
+% Expliquer les choix : Tuple, Attribut, Valeur abstraite
+
+Avant de concevoir la base de données, nous avons défini un diagramme conceptuel qui fait complétement abstraction des toutes implémentations physiques relative à Java.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{diagramme_conceptuel.png}
+    \caption{Modèle conceptuel de données}
+    \label{fig:conceptuel}
+\end{figure}
+
+\subsection{Modèle physique}
+% Insérer le diagramme UML physique complet
+% Justifier les choix d'implémentation
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{diagramme_physique.png}
+    \caption{Modèle physique — diagramme de classes complet}
+    \label{fig:physique}
+\end{figure}
+
+\subsection{Choix de conception notables}
+
+\begin{itemize}
+    \item \textbf{Compteur SERIAL global} : le compteur est centralisé dans
+          \texttt{BaseDeDonnees} et partagé entre toutes les tables elles ont accès au \textit{compteurSerial}.
+    \item \textbf{Hiérarchie de Valeur} : \texttt{ValeurInt} et \texttt{ValeurVarchar}
+          héritent de la classe abstraite \texttt{Valeur}.
+    \item \textbf{Immutabilité} : les listes exposées par \texttt{Table} et
+          \texttt{Tuple} sont immuables.
+          
+    \item \textbf{Classe Table} : Nous nous sommes questionnées si on devrait mettre les Expressions logiques dans \textbf{supprimerTuple} mais nous avons utilisé \textit{les tuples plutôt} afin de réduire le couplage entre Expressions logique et Base de Données. %Utilisation des structures et des extends list %
+    
+\end{itemize}

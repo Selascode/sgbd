@@ -1,0 +1,111 @@
+\documentclass[a4paper,11pt]{article}
+
+% ============================================================
+%  Packages
+% ============================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage{dirtree}
+% ============================================================
+%  Mise en page
+% ============================================================
+\geometry{
+    top=2cm,
+    bottom=2cm,
+    left=2.5cm,
+    right=2.5cm
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Student Gotham Bat Database}
+\lhead{Projet Intégratif — INSA Rouen}
+\rfoot{\thepage}
+
+% ============================================================
+%  Style de code Java
+% ============================================================
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codeblue}{rgb}{0.13,0.13,1}
+\definecolor{backcolour}{rgb}{0.97,0.97,0.97}
+
+\lstdefinestyle{javaStyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codeblue}\bfseries,
+    stringstyle=\color{red},
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    showstringspaces=false,
+    language=Java,
+    frame=single,
+    rulecolor=\color{codegray}
+}
+\lstset{style=javaStyle}
+
+% ============================================================
+%  Page de titre
+% ============================================================
+\title{
+    \vspace{-1cm}
+    \includegraphics[width=4cm]{logo_insa.png} \\
+    \vspace{0.5cm}
+    \Large \textbf{Projet Intégratif — Développement Orienté Objet} \\
+    \vspace{0.3cm}
+    \LARGE \textbf{Student Gotham Bat Database} \\
+    \vspace{0.3cm}
+    \large Rapport de conception et d'implémentation
+}
+\author{
+    Selasi MACLEAN \and
+    Youssef EL AKOUM  \and
+   	Mohamed KAMARA \and
+    Marwan GUERROUACHE \and
+    Roger-Parfait MBAITORNDIA
+}
+\date{ISIA3 2025--2026}
+
+% ============================================================
+%  Document
+% ============================================================
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+% ============================================================
+%  Résumé
+% ============================================================
+\begin{abstract}
+Ce rapport présente la conception et l'implémentation du \textit{Student Gotham Bat Database}
+(SGBD), un système de gestion de base de données relationnel développé en Java dans le cadre
+du projet intégratif de l'ITI. Le système supporte un sous-ensemble du langage SQL incluant
+la création de tables, l'insertion, la sélection avec jointures, la suppression et la
+persistance des données.
+\end{abstract}
+\newpage
+\tableofcontents
+\newpage
+
+\input{Introduction/intro}
+\input{Modélisation & Conception/Modele}
+\input{Implementation/Imp}
+\input{Tests/tests}
+\input{Bilan/bilan}
+
+\end{document}
