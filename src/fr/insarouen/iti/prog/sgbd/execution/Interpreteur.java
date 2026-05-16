@@ -26,8 +26,8 @@ public class Interpreteur{
         new File(dossier).mkdirs(); // crée le dossier si il n'existe pas
 
         GestionnaireStockage gestionnaire = new GestionnaireStockage(
-            new LecteurSerialisation(null),
-            new EnregistreurSerialisation(null)
+            new LecteurSerialisation(),
+            new EnregistreurSerialisation()
         );
 
         BaseDeDonnees bd = null;
