@@ -3,13 +3,16 @@ package fr.insarouen.iti.prog.sgbd.modele;
 import fr.insarouen.iti.prog.sgbd.exceptions.TableExistanteException;
 import fr.insarouen.iti.prog.sgbd.exceptions.TableInconnueException;
 import fr.insarouen.iti.prog.sgbd.exceptions.AttributInconnuException;
+import fr.insarouen.iti.prog.sgbd.exceptions.BaseDeDonneesExistanteException;
 import fr.insarouen.iti.prog.sgbd.exceptions.TypesIncompatibleException;
 import fr.insarouen.iti.prog.sgbd.expressions.ExpressionLogique;
+import fr.insarouen.iti.prog.sgbd.exceptions.BaseDeDonneesExistanteException;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -34,10 +37,12 @@ public class BaseDeDonnees implements Serializable{
      *
      * @param nom le nom de la base de données
      */
-    public BaseDeDonnees(String nom) {
+    public BaseDeDonnees(String nom)  {
+       
         this.nom = nom;
         this.tables = new HashMap<>();
         this.compteurSerial = 0;
+       
     }
 
     /**
@@ -220,6 +225,30 @@ public class BaseDeDonnees implements Serializable{
 
 
     /**
+     * jai ajouter cette methode pour la utiliser dans interupteur pour permeter a utilisateur de voir lea base qui a creer 
+     */
+    // public static void afficherBasesDeDonnees() {
+    //     if (registre.isEmpty()) {
+    //         System.out.println("Aucune base de données créée.");
+    //         return;
+    //     }
+    //     System.out.println("Les bases de données créées sont :");
+    //     for (String nom : registre.keySet()) { 
+    //         System.out.println("  - " + nom);
+    //     }
+    // }
+
+    // // pour récupérer une instance existante depuis l'Interpreteur
+    // public static BaseDeDonnees getBase(String nom) {
+    //     return registre.get(nom.toLowerCase());
+    // }
+
+    // // dans BaseDeDonnees.java
+    // public static Map<String, BaseDeDonnees> getRegistre() {
+    //     return Collections.unmodifiableMap(registre);
+    // }
+
+    /**
      * Retourne le nom de la base de données.
      *
      * @return le nom
@@ -227,5 +256,6 @@ public class BaseDeDonnees implements Serializable{
     public String getNom() {
         return this.nom;
     }
+
 
 }

@@ -12,26 +12,22 @@ import java.util.Collection;
 public class LecteurSerialisation implements Lecteur {
 
     /**
-     * Construit le lecteur.
-     *
-     * @param ois Le flux d'entrée de sérialisation.
-     */
-    private ObjectOutputStream ois;
-
-    public LecteurSerialisation(ObjectOutputStream ois) {
-        this.ois = ois; 
-    }
-    /**
      * Renvoie la base chargé depuis la source de données.
      *
      * @return La {@link BaseDeDonnees} chargé.
      * @throws IOException            En cas d'erreur de lecture.
      * @throws ClassNotFoundException Si une classe sérialisée est introuvable.
+     * @return null                   Dans le cas ou le fichier n'a pas été trouvé
      */
     @Override
     public BaseDeDonnees lire(String chemin) throws IOException, ClassNotFoundException{
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(chemin));
-        return (BaseDeDonnees) ois.readObject(); 
+        try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(chemin))){
+            return (BaseDeDonnees) ois.readObject();
+        }catch(IOException|ClassNotFoundException e){
+            System.err.println("Erreur le fichier n'a pas pu être ouvert: " + e.getMessage());
+            e.printStackTrace();
+        };
+        return null; 
     };
 
 
