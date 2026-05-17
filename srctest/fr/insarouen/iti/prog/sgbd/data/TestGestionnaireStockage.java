@@ -31,8 +31,8 @@ public class TestGestionnaireStockage {
         this.fichierSauvegarde = File.createTempFile("sgbd-test-", ".data");
         this.fichierSauvegarde.delete();
         this.stockage = new GestionnaireStockage(
-                new LecteurSerialisation(null),
-                new EnregistreurSerialisation(null));
+                new LecteurSerialisation(),
+                new EnregistreurSerialisation());
     }
 
     @After
