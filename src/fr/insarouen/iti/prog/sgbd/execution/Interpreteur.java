@@ -43,23 +43,24 @@ public class Interpreteur{
             System.out.print("Ton choix : ");
             String choix = sc.nextLine().trim();
 
-            if (choix.equals("1")) {
+           if (choix.equals("1")) {
                 System.out.print("Nom de la nouvelle base : ");
                 String nom = sc.nextLine().trim();
                 String chemin = dossier + nom + ".ser";
 
                 if (GestionnaireStockage.baseExiste(chemin)) {
-                    System.out.println("[ERREUR] Une base '" + nom + "' existe déjà sur le disque.");
-                    continue;
-                }
+                        System.out.println("[ERREUR] Une base '" + nom + "' existe déjà sur le disque.");
+                        continue;
+                    }
 
-                try {
-                    bd = new BaseDeDonnees(nom);
-                    System.out.println("Base '" + nom + "' créée.");
-                } catch (Exception e) {
-                    System.out.println("[ERREUR] " + e.getMessage());
+                    try {
+                        bd = new BaseDeDonnees(nom);
+                        gestionnaire.sauvegarder(bd, chemin); // ← ajouter ici
+                        System.out.println("Base '" + nom + "' créée.");
+                    } catch (Exception e) {
+                        System.out.println("[ERREUR] " + e.getMessage());
+                    
                 }
-
             
                 } else if (choix.equals("3")) {
                     // affiche et recommence la boucle
@@ -90,10 +91,11 @@ public class Interpreteur{
             }
         }
 
-        if (args.length == 0) {
-            interpreteurConsole(bd, gestionnaire, dossier + bd.getNom() + ".ser");
+      if (args.length == 0) {
+            interpreteurConsole(bd, gestionnaire, dossier + bd.getNom() + ".ser", sc);
         } else {
             interpreteurFichier(args[0], bd, gestionnaire, dossier + bd.getNom() + ".ser");
+            interpreteurConsole(bd, gestionnaire, dossier + bd.getNom() + ".ser", sc);
         }
     }
 
@@ -111,46 +113,52 @@ public class Interpreteur{
     }
 
 
-    public static void interpreteurConsole(BaseDeDonnees db, GestionnaireStockage gestionnaire, String chemin) {
-        Scanner sc = new Scanner(System.in);
+    public static void interpreteurConsole(BaseDeDonnees db, GestionnaireStockage gestionnaire, String chemin, Scanner sc) {
+        
         String commande = "";
-
         System.out.print("sgbd> ");
 
-        while (sc.hasNextLine()) {
-            commande += sc.nextLine();
+        try {
+            while (true) {
+                String ligne = sc.nextLine();
+                commande += ligne;
 
-            String commandeLower = commande.trim().toLowerCase();
-            if (commandeLower.equals("quit") || commandeLower.equals("exit") ||
-                commandeLower.equals("quit;") || commandeLower.equals("exit;")) {
-                System.out.println("Au revoir ;)");
-                return; // etourne au main 
-            }
-
-            if (commande.trim().endsWith(";")) {
-                commande = commande.trim();
-
-                byte[] bytes = commande.getBytes();
-                ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-                SGBDParser parser = new SGBDParser(bais);
-                parser.setDatabase(db);
-
-                try {
-                    parser.Commande();
-                    gestionnaire.sauvegarder(db, chemin); // sauvegarde après chaque commande
-                } catch (ParseException e) {
-                    System.out.println("[ERREUR] Syntaxe incorrecte : " + e.getMessage());
-                } catch (TokenMgrError e) {
-                    System.out.println("[ERREUR] Caractère inconnu : " + e.getMessage());
-                } catch (Exception e) {
-                    System.out.println("[ERREUR] Sauvegarde : " + e.getMessage());
+                String commandeLower = commande.trim().toLowerCase();
+                if (commandeLower.equals("quit") || commandeLower.equals("exit") ||
+                    commandeLower.equals("quit;") || commandeLower.equals("exit;")) {
+                    System.out.println("Au revoir ;)");
+                    return;
                 }
 
-                commande = "";
-                System.out.print("sgbd> ");
+                if (commande.trim().endsWith(";")) {
+                    commande = commande.trim();
+
+                    byte[] bytes = commande.getBytes();
+                    ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+                    SGBDParser parser = new SGBDParser(bais);
+                    parser.setDatabase(db);
+
+                    try {
+                        parser.Commande();
+                        gestionnaire.sauvegarder(db, chemin);
+                    } catch (ParseException e) {
+                        System.out.println("[ERREUR] Syntaxe incorrecte : " + e.getMessage());
+                    } catch (TokenMgrError e) {
+                        System.out.println("[ERREUR] Caractère inconnu : " + e.getMessage());
+                    } catch (Exception e) {
+                        System.out.println("[ERREUR] Sauvegarde : " + e.getMessage());
+                    }
+
+                    commande = "";
+                    System.out.print("sgbd> ");
+                }
             }
+        } catch (java.util.NoSuchElementException e) {
+            // stdin fermé (Ctrl+D), on sort proprement
+            System.out.println("\nAu revoir ;)");
         }
     }
+    
     public static void interpreteurFichier(String cheminFichier, BaseDeDonnees db, GestionnaireStockage gestionnaire, String chemin) {
         try {
             FileInputStream fis = new FileInputStream(cheminFichier);
@@ -161,11 +169,8 @@ public class Interpreteur{
             while (true) {
                 try {
                     parser.Commande();
-
                 } catch (ParseException e) {
-                    if (e.getMessage() != null && e.getMessage().contains("EOF")) {
-                        break; // fin normale du fichier
-                    }
+                    if (e.getMessage() != null && e.getMessage().contains("EOF")) break;
                     System.out.println("[ERREUR] " + e.getMessage());
                     break;
                 } catch (TokenMgrError e) {
@@ -174,16 +179,13 @@ public class Interpreteur{
                 }
             }
 
-            gestionnaire.sauvegarder(db, chemin); // sauvegarde à la fin du fichier
-            System.out.println("Au revoir ;)");
-
         } catch (java.io.FileNotFoundException e) {
             System.out.println("[ERREUR] Fichier introuvable : " + cheminFichier);
         } catch (Exception e) {
-            System.out.println("[ERREUR] " + e.getMessage());
+            System.out.println("[ERREUR] Lecture : " + e.getMessage());
         }
+        // pas de sauvegarde ici — c'est interpreteurConsole qui gère ça
     }
-
     
 
 
