@@ -1,6 +1,25 @@
+/**
+ * Grammaire JavaCC pour le mini-SGBD.
+ *
+ * Ce fichier définit l'analyse lexicale (tokens) et l'analyse syntaxique
+ * (grammaire) d'un sous-ensemble du langage SQL.
+ *
+ * Commandes supportées :
+ *   CREATE TABLE nom (col TYPE, ...)
+ *   DROP TABLE nom
+ *   INSERT INTO nom (cols) VALUES (vals)
+ *   DELETE FROM nom [WHERE condition]
+ *   SELECT cols|* FROM sources [WHERE condition]
+ *   TABLES
+ *   EXIT | QUIT
+ *
+ * Options du générateur :
+ *   STATIC = false    — instances non statiques, plusieurs parseurs peuvent coexister.
+ *   IGNORE_CASE = true — mots-clés insensibles à la casse (SELECT == select).
+ */
 options {
   STATIC = false;
-  IGNORE_CASE = true; // ignore la casse pour les mots-cle
+  IGNORE_CASE = true;
 }
 
 PARSER_BEGIN(SGBDParser)
@@ -27,16 +46,30 @@ import fr.insarouen.iti.prog.sgbd.exceptions.TypesIncompatibleException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Parseur SQL pour le mini-SGBD.
+ *
+ * <p>Le parseur exécute chaque commande SQL directement sur la {@link BaseDeDonnees}
+ * injectée via {@link #setDatabase(BaseDeDonnees)}, sans passer par une couche
+ * d'objets "Commande" intermédiaires.</p>
+ *
+ * <p>Utilisation typique :</p>
+ * <pre>
+ *   SGBDParser parser = new SGBDParser(System.in);
+ *   parser.setDatabase(maBase);
+ *   parser.Commande();
+ * </pre>
+ */
 public class SGBDParser {
 
-  /** notre base de données sur laquelle le parseur va directement exécuter ses commandes
-   * au lieu de faire une nouvelle class Commandes et retourner des instances de celles ci
-   */
+  /** Base de données cible sur laquelle les commandes sont exécutées. */
   private BaseDeDonnees db;
 
   /**
-   * Injecte la base de données cible
-   * Doit etre appelé avant toute command
+   * Injecte la base de données cible.
+   * Doit être appelé avant toute commande SQL.
+   *
+   * @param database la base de données à utiliser
    */
   public void setDatabase(BaseDeDonnees database) {
       this.db = database;
@@ -46,19 +79,31 @@ public class SGBDParser {
 PARSER_END(SGBDParser)
 
 /* =========================================================================
-ANALYSE LEXICALE (Tokens)
+   ANALYSE LEXICALE (Tokens)
    ========================================================================= */
 
-// Espaces et commentaires à ignorer
+/**
+ * Caractères et séquences ignorés par le lexeur :
+ *   - espaces, tabulations, retours à la ligne
+ *   - commentaires SQL sur une ligne (-- jusqu'à la fin de ligne)
+ */
 SKIP : {
   " "
 | "\t"
 | "\n"
 | "\r"
-| < "--" (~["\n","\r"])* ("\n"|"\r"|"\r\n")? > // tpous les ommentaires SQL débutant par --
+| < "--" (~["\n","\r"])* ("\n"|"\r"|"\r\n")? >
 }
 
-// Mots-clés du SQL
+/**
+ * Mots-clés SQL reconnus.
+ * La correspondance est insensible à la casse grâce à IGNORE_CASE = true.
+ *
+ *   DDL   : CREATE, TABLE, DROP
+ *   DML   : INSERT, INTO, VALUES, DELETE, FROM, WHERE, SELECT, AS
+ *   Divers: TABLES (liste les tables), EXIT / QUIT (quitte le REPL)
+ *   Logique: AND, OR (combinaison de conditions WHERE)
+ */
 TOKEN : {
   < CREATE: "CREATE" >
 | < TABLE: "TABLE" >
@@ -78,14 +123,28 @@ TOKEN : {
 | < OR: "OR" >
 }
 
-// Types de données supportés
+/**
+ * Types de colonnes supportés dans CREATE TABLE.
+ *
+ *   INT     — entier signé
+ *   SERIAL  — entier auto-incrémenté (clé primaire synthétique)
+ *   VARCHAR — chaîne de caractères de longueur variable
+ */
 TOKEN : {
   < TYPE_INT: "INT" >
 | < TYPE_SERIAL: "SERIAL" >
 | < TYPE_VARCHAR: "VARCHAR" >
 }
 
-// Opérateurs et Ponctuation
+/**
+ * Opérateurs et ponctuation.
+ *
+ *   ; — fin de commande (SEMICOLON)
+ *   , — séparateur de liste (COMMA)
+ *   ( ) — délimiteurs de liste (LPAREN / RPAREN)
+ *   * — sélection de toutes les colonnes (STAR)
+ *   = > < — opérateurs de comparaison (OP_EQ, OP_GT, OP_LT)
+ */
 TOKEN : {
   < SEMICOLON: ";" >
 | < COMMA: "," >
@@ -97,18 +156,32 @@ TOKEN : {
 | < OP_LT: "<" >
 }
 
-// Identifiants et Valeurs (basés sur le tableau de la fin du sujet)
+/**
+ * Littéraux et identifiants.
+ *
+ *   NUMBER — suite de chiffres (entier non signé)
+ *   STRING — chaîne entre guillemets doubles, sans guillemet interne
+ *   ID     — identifiant commençant par une lettre, suivi de lettres,
+ *            chiffres, underscores ou points (pour la notation table.colonne)
+ */
 TOKEN : {
   < NUMBER: (["0"-"9"])+ >
-| < STRING: "\"" (~["\""])* "\"" > // echaper les "
+| < STRING: "\"" (~["\""])* "\"" >
 | < ID: (["a"-"z", "A"-"Z"]) (["a"-"z", "A"-"Z", "0"-"9", "_", "."])* >
 }
 
 /* =========================================================================
-ANALYSE SYNTAXIQUE (Grammaire)
+   ANALYSE SYNTAXIQUE (Grammaire)
    ========================================================================= */
 
-// Règle principale (Point d'entrée)
+/**
+ * Point d'entrée du parseur : reconnaît une commande SQL terminée par ';'.
+ *
+ * Grammaire :
+ *   Commande ::= ( CommandeCreate | CommandeInsert | CommandeSelect
+ *                | CommandeDrop   | CommandeDelete | CommandeTables
+ *                | CommandeExit ) ";"
+ */
 void Commande() :
 {}
 {
@@ -124,7 +197,15 @@ void Commande() :
   <SEMICOLON>
 }
 
-// CREATE TABLE nom (col1 TYPE, col2 TYPE, ...)
+/**
+ * CREATE TABLE nom (col1 TYPE, col2 TYPE, ...)
+ *
+ * Crée une nouvelle table avec le schéma fourni et l'enregistre dans la base.
+ * Affiche une erreur si une table du même nom existe déjà.
+ *
+ * Grammaire :
+ *   CommandeCreate ::= "CREATE" "TABLE" ID "(" Colonne ("," Colonne)* ")"
+ */
 void CommandeCreate() :
 {
   Token nomTable;
@@ -144,7 +225,14 @@ void CommandeCreate() :
   }
 }
 
-// Colonne : ajoute un Attribut dans le schema
+/**
+ * Colonne : reconnaît la définition d'une colonne et ajoute un {@link Attribut} dans le schéma.
+ *
+ * Grammaire :
+ *   Colonne ::= ID Type
+ *
+ * @param schema liste dans laquelle l'attribut est ajouté
+ */
 void Colonne(List<Attribut> schema) :
 { 
   Token nomCol; 
@@ -157,7 +245,14 @@ void Colonne(List<Attribut> schema) :
   }
 }
 
-// Type : retourne le Type Java correspondant au mot-clé lu
+/**
+ * Type : reconnaît un mot-clé de type SQL et retourne l'enum {@link Type} correspondant.
+ *
+ * Grammaire :
+ *   Type ::= "INT" | "SERIAL" | "VARCHAR"
+ *
+ * @return le {@link Type} Java associé au mot-clé reconnu
+ */
 Type Type() :
 {}
 {
@@ -166,7 +261,15 @@ Type Type() :
 | <TYPE_VARCHAR> { return Type.VARCHAR; }
 }
 
-// DROP TABLE nom
+/**
+ * DROP TABLE nom
+ *
+ * Supprime la table dont le nom est fourni.
+ * Affiche une erreur si la table n'existe pas.
+ *
+ * Grammaire :
+ *   CommandeDrop ::= "DROP" "TABLE" ID
+ */
 void CommandeDrop() :
 { 
   Token nomTable; 
@@ -183,7 +286,15 @@ void CommandeDrop() :
   }
 }
 
-// TABLES : liste toutes les tables existantes
+/**
+ * TABLES
+ *
+ * Affiche la liste de toutes les tables présentes dans la base.
+ * Affiche "(Aucune table)" si la base est vide.
+ *
+ * Grammaire :
+ *   CommandeTables ::= "TABLES"
+ */
 void CommandeTables() :
 {}
 {
@@ -198,7 +309,20 @@ void CommandeTables() :
   }
 }
 
-// INSERT INTO nom (col1, col2, ...) VALUES (val1, val2, ...)
+/**
+ * INSERT INTO nom (col1, col2, ...) VALUES (val1, val2, ...)
+ *
+ * Insère un nouveau tuple dans la table spécifiée.
+ * Les colonnes de type SERIAL absentes de la liste sont auto-incrémentées.
+ * Affiche une erreur si le nombre de colonnes et de valeurs diffère,
+ * si une colonne est manquante, ou si la table est inconnue.
+ *
+ * Grammaire :
+ *   CommandeInsert ::= "INSERT" "INTO" ID
+ *                      "(" ID ("," ID)* ")"
+ *                      "VALUES"
+ *                      "(" Valeur ("," Valeur)* ")"
+ */
 void CommandeInsert() :
 {
   Token nomTable;
@@ -250,7 +374,17 @@ void CommandeInsert() :
   }
 }
 
-// Valeur : retourne l'objet Valeur Java correspondant (INT ou VARCHAR)
+/**
+ * Valeur : reconnaît un littéral et retourne l'objet {@link Valeur} correspondant.
+ *
+ * Grammaire :
+ *   Valeur ::= NUMBER | STRING
+ *
+ * NUMBER produit une {@link ValeurInt}, STRING produit une {@link ValeurVarchar}
+ * (les guillemets encadrants sont retirés).
+ *
+ * @return l'instance de {@link Valeur} correspondant au littéral reconnu
+ */
 Valeur Valeur() :
 { Token t; }
 {
@@ -258,7 +392,16 @@ Valeur Valeur() :
 | t=<STRING>  { return new ValeurVarchar(t.image.substring(1, t.image.length() - 1)); }
 }
 
-// DELETE FROM nom (WHERE condition)?
+/**
+ * DELETE FROM nom [WHERE condition]
+ *
+ * Supprime les tuples de la table qui satisfont la condition WHERE.
+ * Sans clause WHERE, tous les tuples sont supprimés.
+ * Affiche le nombre de lignes supprimées.
+ *
+ * Grammaire :
+ *   CommandeDelete ::= "DELETE" "FROM" ID ( "WHERE" ExpressionLogique )?
+ */
 void CommandeDelete() :
 { 
   Token nomTable; 
@@ -296,7 +439,21 @@ void CommandeDelete() :
   }
 }
 
-// SELECT cols FROM sources (WHERE condition)?
+/**
+ * SELECT cols|* FROM sources [WHERE condition]
+ *
+ * Évalue la requête de sélection en trois étapes :
+ *   1. Produit cartésien des sources (si plusieurs tables séparées par des virgules).
+ *   2. Sélection (filtrage des tuples selon la clause WHERE).
+ *   3. Projection (restriction aux colonnes demandées, ou toutes si "*").
+ *
+ * Le résultat est affiché sous forme de tableau formaté avec le nombre de lignes retournées.
+ *
+ * Grammaire :
+ *   CommandeSelect ::= "SELECT" ( "*" | ID ("," ID)* )
+ *                      "FROM" Source ("," Source)*
+ *                      ( "WHERE" ExpressionLogique )?
+ */
 void CommandeSelect() :
 {
   Token col;
@@ -368,7 +525,17 @@ void CommandeSelect() :
   }
 }
 
-// Source : capture le nom de la table (et son alias optionnel) dans la liste
+/**
+ * Source : reconnaît une table source avec son alias optionnel.
+ *
+ * L'alias est accepté syntaxiquement mais ignoré à l'exécution (les jointures
+ * nommées et la résolution d'alias seront gérées dans une version ultérieure).
+ *
+ * Grammaire :
+ *   Source ::= ID ( "AS"? ID )?
+ *
+ * @param sources liste dans laquelle le nom de la table est ajouté
+ */
 void Source(List<String> sources) :
 { 
   Token t; 
@@ -379,6 +546,15 @@ void Source(List<String> sources) :
   ( (<AS>)? a=<ID> )?  // alias est  ignoré pour l'instant, sera fait quand y aura les jointures et autred
 }
 
+/**
+ * EXIT | QUIT
+ *
+ * Termine proprement le REPL en affichant un message d'au revoir,
+ * puis appelle {@code System.exit(0)}.
+ *
+ * Grammaire :
+ *   CommandeExit ::= ( "EXIT" | "QUIT" )
+ */
 void CommandeExit() :
 {}
 {
@@ -389,7 +565,17 @@ void CommandeExit() :
   }
 }
 
-// Expressions logiques
+/**
+ * ExpressionLogique : reconnaît une suite de conditions reliées par AND / OR.
+ *
+ * Les opérateurs sont évalués de gauche à droite sans priorité entre AND et OR
+ * (pas de parenthèses supportées dans cette version).
+ *
+ * Grammaire :
+ *   ExpressionLogique ::= ConditionSimple ( ( "AND" | "OR" ) ConditionSimple )*
+ *
+ * @return l'{@link ExpressionLogique} construite
+ */
 ExpressionLogique ExpressionLogique() :
 {
   ExpressionLogique expr = new ExpressionLogique();
@@ -412,6 +598,14 @@ ExpressionLogique ExpressionLogique() :
   { return expr; }
 }
 
+/**
+ * ConditionSimple : reconnaît une comparaison binaire entre deux opérandes.
+ *
+ * Grammaire :
+ *   ConditionSimple ::= Operande ( "=" | ">" | "<" ) Operande
+ *
+ * @return la {@link ConditionSimple} construite avec l'opérateur et les deux opérandes
+ */
 ConditionSimple ConditionSimple() :
 {
   Operande gauche;
@@ -427,10 +621,19 @@ ConditionSimple ConditionSimple() :
   }
 }
 
+/**
+ * Operande : reconnaît un nom de colonne ou un littéral et retourne l'{@link Operande} correspondant.
+ *
+ * Grammaire :
+ *   Operande ::= ID | Valeur
+ *
+ * Un ID est interprété comme un nom de colonne ; NUMBER ou STRING comme une valeur constante.
+ *
+ * @return l'{@link Operande} construit (colonne ou valeur littérale)
+ */
 Operande Operande() :
 { Token t; Valeur v; }
 {
-  // C'est soit un nom de colonne, soit une valeur littérale
   t=<ID> { return new Operande(t.image); }
 |
   v=Valeur() {

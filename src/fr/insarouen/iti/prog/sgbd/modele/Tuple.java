@@ -11,11 +11,11 @@ import java.util.stream.Collectors;
 
 /**
  * Représente un tuple (une ligne de données) dans une table.
- * Implémente List<Valeur> via AbstractList pour un accès direct
+ * Implément la liste de Valeur via AbstractList pour un accès direct
  * aux valeurs avec toutes les opérations de liste standard. 
  * Sans avoir à tout redéfinir
  * 
- * * @author Elakoum & Maclean
+ * * @author Elakoum 
  * @version 2.0
  */
 

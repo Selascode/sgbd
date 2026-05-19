@@ -40,7 +40,7 @@ public class Table implements Serializable {
      * Construction d'une table vide 
      * Lors de la creation dune table en fait CREATE NOM (aat1,att2,att3)
      * @param nom tab a creer
-     * @param attibuts contient la liste d'attributs à ajouter
+     * @param attributs contient la liste d'attributs à ajouter
      */
 
     public Table(String nom, Collection<Attribut> attributs) { // en se basant sur lexemple de crearion d'une table de fichier exemple du moodle
@@ -107,7 +107,8 @@ public class Table implements Serializable {
     }
 
     /**
-     * @param
+     * Affiche le schéma complet d'une table
+     * 
      * @return l 'attribut dont il ya le nom nom
      */
 

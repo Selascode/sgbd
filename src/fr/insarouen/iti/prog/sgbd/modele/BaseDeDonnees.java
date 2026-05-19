@@ -210,7 +210,7 @@ public class BaseDeDonnees implements Serializable{
 
     /**
      * pplique une sélection sur les tuples en conservant uniquement ceux qui vérifient la condit iob
-     * @param conditiob L'expression logique à évaluer
+     * @param condition L'expression logique à évaluer
      * @return une nouvelle table contenant les tuples filtrés
      */
     public Table selection(Table table, ExpressionLogique condition) throws AttributInconnuException, TypesIncompatibleException {

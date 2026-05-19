@@ -21,7 +21,7 @@ public class EnregistreurSerialisation  implements Enregistreur{
      * La méthode employé ferme automatiquement le fichier 
      *
      * @param bd          La base de donnée à sauvegarder.
-     * @param conditionsDeFin Les conditions de fin à sauvegarder.
+     * @param chemin  Le chemin où stocker les données.
      * @throws IOException En cas d'erreur d'écriture.
      */
     @Override

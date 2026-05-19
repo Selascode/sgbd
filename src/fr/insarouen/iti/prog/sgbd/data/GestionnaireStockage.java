@@ -13,10 +13,10 @@ public class GestionnaireStockage {
     }
     /**
      * Fonction qui permert de sauvegarder notre {@link BaseDeDonnees}
-     * dans un fichier
+     * dans un fichier et d'afficher dans la sortie standart l'emplacemeent du fichier
      * 
      * @param chemin
-     * @return @{@link BaseDeDonnees}
+     *
      */
     public void sauvegarder(BaseDeDonnees db, String chemin) throws IOException {
         this.enregistreur.enregistrer(db, chemin);
