@@ -188,4 +188,19 @@ public class TestParseur {
         assertThat(db.getTable("heroes").getTuples().size(), equalTo(2));
         assertThat(db.listerTables().size(), equalTo(1));
     }
+
+    // -------------------------------------------------------------------------
+    // Les Alias 
+    // -------------------------------------------------------------------------
+    @Test
+    public void test_parseur_reconnaisance_alias_guillements_simple() throws Exception {
+        executer("CREATE TABLE employes (id INT, nom VARCHAR, manager_id INT);");
+        executer("INSERT INTO employes (id, nom, manager_id) VALUES (1, 'Bruce Wayne', 0);");
+        executer("INSERT INTO employes (id, nom, manager_id) VALUES (2, 'Alfred Pennyworth', 1);");
+        executer("INSERT INTO employes (id, nom, manager_id) VALUES (4, 'Jason Todd', 3);");
+        executer("INSERT INTO employes (id, nom, manager_id) VALUES (3, 'Dick Grayson', 1);");
+        executer("SELECT E.nom, M.nom FROM employes E, employes M WHERE E.manager_id = M.id;");
+        executer("SELECT E.nom, M.nom FROM employes AS E, employes AS M WHERE E.manager_id = M.id;");
+        executer("EXIT;");
+    }
 }

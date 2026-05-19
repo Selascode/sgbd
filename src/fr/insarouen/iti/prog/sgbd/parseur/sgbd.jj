@@ -166,7 +166,8 @@ TOKEN : {
  */
 TOKEN : {
   < NUMBER: (["0"-"9"])+ >
-| < STRING: "\"" (~["\""])* "\"" >
+| < STRING: "\"" (~["\""])* "\"" 
+            |"'" (~["'"])* "'">
 | < ID: (["a"-"z", "A"-"Z"]) (["a"-"z", "A"-"Z", "0"-"9", "_", "."])* >
 }
 
@@ -457,10 +458,8 @@ void CommandeDelete() :
 void CommandeSelect() :
 {
   Token col;
-  Token alias;
   List<String> colonnes = new ArrayList<>();
-  Token source;
-  List<String> sources   = new ArrayList<>();
+  List<String[]> sources   = new ArrayList<>();
   boolean etoile = false;
   ExpressionLogique expr = null;
 }
@@ -478,11 +477,27 @@ void CommandeSelect() :
   )?
   {
     try {
-      // 1. Produit cartésien si plusieurs sources
-      Table tableResultat = db.getTable(sources.get(0));
-      for (int i = 1; i < sources.size(); i++) {
-          tableResultat = db.produitCartesien(tableResultat,db.getTable(sources.get(i)));
+      // Gestion de la table avec prefixe eventuelle
+      boolean aAlias = sources.size()>1; 
+      Table tableResultat = null;
+      for (String[] src : sources){
+        String alias = src[0]; 
+        String nomTable = src[1]; 
+        Table t = db.getTable(nomTable); 
+
+        String prefixe = (alias != null) ? alias
+                       : (aAlias) ? nomTable
+                       : null;
+
+        if (prefixe != null){
+          t = t.renommerAvecPrefixe(prefixe); 
+        }
+
+        tableResultat =  (tableResultat == null) ? t : db.produitCartesien(tableResultat,t);
+
       }
+      
+      
 
       // 2. Sélection (WHERE) -> on délègue à l'algèbre relationnelle de Table
       if (expr != null) {
@@ -536,14 +551,18 @@ void CommandeSelect() :
  *
  * @param sources liste dans laquelle le nom de la table est ajouté
  */
-void Source(List<String> sources) :
+void Source(List<String[]> sources) :
 { 
   Token t; 
-  Token a; 
+  Token a = null; 
 }
 {
-  t=<ID> { sources.add(t.image); }
+  t=<ID> 
   ( (<AS>)? a=<ID> )?  // alias est  ignoré pour l'instant, sera fait quand y aura les jointures et autred
+  { 
+    String alias = (a != null) ? a.image : null; 
+    sources.add(new String[]{alias,t.image});
+  }
 }
 
 /**
