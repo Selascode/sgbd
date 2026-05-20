@@ -43,6 +43,7 @@ import fr.insarouen.iti.prog.sgbd.exceptions.TableExistanteException;
 import fr.insarouen.iti.prog.sgbd.exceptions.TableInconnueException;
 import fr.insarouen.iti.prog.sgbd.exceptions.AttributInconnuException;
 import fr.insarouen.iti.prog.sgbd.exceptions.TypesIncompatibleException;
+import static java.util.stream.Collectors.joining;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -305,7 +306,9 @@ void CommandeTables() :
     if (tables.isEmpty()) {
       System.out.println("(Aucune table)");
     } else {
-      System.out.println("Tables : \n" + tables);
+      System.out.println("Tables disponibles : \n -" + tables
+                                                    .stream()
+                                                    .collect(joining("\n -")));
     }
   }
 }
@@ -367,10 +370,10 @@ void CommandeInsert() :
           }
         }
         table.insererTuple(new Tuple(tuppleValues));
-        System.out.println("[OK] Ligne insérée dans '" + nomTable.image + "'");
+        System.out.println("> 1 ligne insérée dans " + nomTable.image);
       }
     } catch (TableInconnueException e) {
-      System.err.println("[ERREUR] " + e.getMessage());
+      System.err.println("[ERREUR]>" + e.getMessage());
     }
   }
 }
@@ -508,7 +511,7 @@ void CommandeSelect() :
       if (!etoile) {
           tableResultat = db.projection(tableResultat,colonnes);
       }
-
+      System.out.println("> Table : "+ tableResultat.getNom());
       // 4. Affichage en tableau
       List<Attribut> schema = new ArrayList<>(tableResultat.getAttributs());
       int largeur = 18;
