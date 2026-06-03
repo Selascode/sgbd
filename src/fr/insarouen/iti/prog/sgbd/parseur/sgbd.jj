@@ -160,13 +160,14 @@ TOKEN : {
  * Littéraux et identifiants.
  *
  *   NUMBER — suite de chiffres (entier non signé)
- *   STRING — chaîne entre guillemets doubles, sans guillemet interne
+ *   STRING — chaîne entre guillemets doubles ou simples, sans guillemet interne
  *   ID     — identifiant commençant par une lettre, suivi de lettres,
  *            chiffres, underscores ou points (pour la notation table.colonne)
  */
 TOKEN : {
   < NUMBER: (["0"-"9"])+ >
-| < STRING: "\"" (~["\""])* "\"" >
+| < STRING: "\"" (~["\""])* "\"" 
+            | "'"  (~["'"])*  "'" >
 | < ID: (["a"-"z", "A"-"Z"]) (["a"-"z", "A"-"Z", "0"-"9", "_", "."])* >
 }
 
@@ -315,7 +316,8 @@ void CommandeTables() :
  * Insère un nouveau tuple dans la table spécifiée.
  * Les colonnes de type SERIAL absentes de la liste sont auto-incrémentées.
  * Affiche une erreur si le nombre de colonnes et de valeurs diffère,
- * si une colonne est manquante, ou si la table est inconnue.
+ * si une colonne est manquante, si le typle inséré dans le tuple est incohérent 
+ * ou si la table est inconnue.
  *
  * Grammaire :
  *   CommandeInsert ::= "INSERT" "INTO" ID
@@ -343,7 +345,6 @@ void CommandeInsert() :
   {
     try {
       Table table = db.getTable(nomTable.image);
-
       // Vérification : même nombre de colonnes et de valeurs
       if (colonnes.size() != valeurs.size()) {
         System.err.println("[ERREUR] INSERT : nombre de colonnes et de valeurs différents");
