@@ -158,7 +158,7 @@ public class BaseDeDonnees implements Serializable{
             nouveauSchema.add(ancienSchema.get(idx)); 
         }
         // Nouvelle table résultat dans laquelle on va mettre les nouveaux tuples ù
-        Table res = new Table(table.getNom()+"_proj", nouveauSchema); 
+        Table res = new Table(table.getNom()+"_projection", nouveauSchema); 
 
 
         //Projection de chaques tuples 

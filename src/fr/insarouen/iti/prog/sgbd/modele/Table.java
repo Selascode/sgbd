@@ -159,4 +159,22 @@ public class Table implements Serializable {
         this.attributs.add(a);
     }
 
+    /**
+     * Méthode permettant la gestions des alias 
+     * Crée une table où tous les attributs sont préfixé par l'alias
+     *
+     * @param prefixe le préfixe (alias ou nom de table)
+     * @return la nouvelle table préfixée
+     */
+    public Table renommerAvecPrefixe(String prefixe){
+        List<Attribut> attrPrefixe = new ArrayList<>(); 
+        for (Attribut attr : this.attributs){
+            attrPrefixe.add(new Attribut(prefixe+"."+attr.nom(),attr.type()));
+        }
+        Table res = new Table(prefixe, attrPrefixe);
+        for (Tuple t : this.tuples){
+            res.insererTuple(t);
+        }
+        return res; 
+    }
 }

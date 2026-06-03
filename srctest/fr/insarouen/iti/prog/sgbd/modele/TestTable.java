@@ -12,6 +12,7 @@ import fr.insarouen.iti.prog.sgbd.exceptions.TupleInconnuException;
  
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
  
 public class TestTable {
     private Table tableHeros;
@@ -208,5 +209,21 @@ public class TestTable {
         aSupprimer.add(this.tuple2);
         this.tableHeros.supprimerTuples(aSupprimer);
     }
+
+    @Test 
+    public void test_Table_enommerAvecPrefixe() throws TupleInconnuException {
+        Table test = this.tableHeros.renommerAvecPrefixe("test");
+        List<Attribut> lesAttributs = new ArrayList<>(test.getAttributs()); 
+        List<String> nomAttributs = lesAttributs.stream()
+                                                .map(a -> a.nom())
+                                                .collect(Collectors.toList());
+
+        assertThat(nomAttributs.contains("test.id"), equalTo(true));
+        assertThat(nomAttributs.contains("test.puissance"), equalTo(true));
+        assertThat(nomAttributs.contains("test.nom"), equalTo(true));
+        assertThat(lesAttributs.size(), equalTo(3));
+    }
+
+    
 
 }
