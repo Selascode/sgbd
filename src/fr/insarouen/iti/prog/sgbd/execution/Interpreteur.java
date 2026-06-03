@@ -36,8 +36,15 @@ public class Interpreteur {
                 String choix = sc.nextLine().trim();
 
                 if (choix.equals("1")) {
-                    System.out.print("Nom de la nouvelle base : ");
-                    String nom = sc.nextLine().trim();
+                    String nom = "";
+                    while (nom.isEmpty()) {
+                        System.out.print("Nom de la nouvelle base : ");
+                        nom = sc.nextLine().trim();
+                        if (nom.isEmpty()) {
+                            System.out.println("[ERREUR] Le nom ne peut pas être vide.");
+                        }
+                    }
+                                        
                     String chemin = dossier + nom + ".ser";
 
                     if (GestionnaireStockage.baseExiste(chemin)) {
