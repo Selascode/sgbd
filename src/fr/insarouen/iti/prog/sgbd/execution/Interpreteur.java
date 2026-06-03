@@ -36,8 +36,15 @@ public class Interpreteur {
                 String choix = sc.nextLine().trim();
 
                 if (choix.equals("1")) {
-                    System.out.print("Nom de la nouvelle base : ");
-                    String nom = sc.nextLine().trim();
+                    String nom = "";
+                    while (nom.isEmpty()) {
+                        System.out.print("Nom de la nouvelle base : ");
+                        nom = sc.nextLine().trim();
+                        if (nom.isEmpty()) {
+                            System.out.println("[ERREUR] Le nom ne peut pas être vide.");
+                        }
+                    }
+                                        
                     String chemin = dossier + nom + ".ser";
 
                     if (GestionnaireStockage.baseExiste(chemin)) {
@@ -157,7 +164,8 @@ public class Interpreteur {
                 commande += ligne;
 
                 String commandeLower = commande.trim().toLowerCase();
-
+                String commandeTrim  = commande.trim();
+                
                 if (commandeLower.equals("menu") || commandeLower.equals("menu;")) {
                     System.out.println("Retour au menu principal...\n");
                     return;
@@ -168,6 +176,23 @@ public class Interpreteur {
                     System.out.println("Au revoir ;)");
                     System.exit(0);
                 }
+
+                if(commandeLower.startsWith("source ")){
+                    String cheminFichier = commandeTrim.substring(7).trim();
+                    cheminFichier = cheminFichier.substring(0, cheminFichier.length() - 1).trim();
+                  
+
+                    if (cheminFichier.isEmpty()){
+                        System.out.println("[ERREUR] Syntaxe : source <chemin_vers_fichier.sql>"); 
+                    } else {
+                        System.out.println("Execution du fichier : " + cheminFichier);
+                        interpreteurFichier(cheminFichier, db, gestionnaire, chemin);
+                    }
+
+                    commande = "";
+                    System.out.print("sgbd> ");
+                }
+
 
                 if (commande.trim().endsWith(";")) {
                     commande = commande.trim();
@@ -192,6 +217,7 @@ public class Interpreteur {
 
                     commande = "";
                     System.out.print("sgbd> ");
+                    continue; 
                 }
             }
         } catch (java.util.NoSuchElementException e) {
