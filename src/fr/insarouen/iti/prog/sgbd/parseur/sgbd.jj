@@ -362,7 +362,15 @@ void CommandeInsert() :
               System.err.println("[ERREUR] Colonne '" + attr.nom() + "' manquante dans le INSERT");
               return;
             }
-            tuppleValues.add(valeurs.get(idx));
+            Valeur v = valeurs.get(idx);
+            //Vérification que le type est également cohérent 
+            if (!v.estCompatible(attr.type())) {
+              System.err.println("[ERREUR] Type incompatible pour la colonne '"
+                  + attr.nom() + "' : attendu "
+                  + attr.type() + ", reçu " + v.getType());
+              return;
+            }
+            tuppleValues.add(v);
           }
         }
         table.insererTuple(new Tuple(tuppleValues));

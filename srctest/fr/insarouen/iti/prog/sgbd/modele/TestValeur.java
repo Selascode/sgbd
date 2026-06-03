@@ -54,23 +54,23 @@ public class TestValeur {
  
  
     @Test
-    public void test_ValeurInt_compareA_egal() throws TypesIncompatibleException {
-        assertThat(this.vInt2.compareA(this.vInt3), equalTo(0));
+    public void test_ValeurInt_compareTo_egal() throws TypesIncompatibleException {
+        assertThat(this.vInt2.compareTo(this.vInt3), equalTo(0));
     }
  
     @Test
-    public void test_ValeurInt_compareA_inferieur() throws TypesIncompatibleException {
-        assertThat(this.vInt1.compareA(this.vInt2) < 0, equalTo(true));
+    public void test_ValeurInt_compareTo_inferieur() throws TypesIncompatibleException {
+        assertThat(this.vInt1.compareTo(this.vInt2) < 0, equalTo(true));
     }
  
     @Test
-    public void test_ValeurInt_compareA_superieur() throws TypesIncompatibleException {
-        assertThat(this.vInt2.compareA(this.vInt1) > 0, equalTo(true));
+    public void test_ValeurInt_compareTo_superieur() throws TypesIncompatibleException {
+        assertThat(this.vInt2.compareTo(this.vInt1) > 0, equalTo(true));
     }
  
     @Test(expected = TypesIncompatibleException.class)
-    public void test_ValeurInt_compareA_typesIncompatibles() throws TypesIncompatibleException {
-        this.vInt1.compareA(this.vVC1);
+    public void test_ValeurInt_compareTo_typesIncompatibles() throws TypesIncompatibleException {
+        this.vInt1.compareTo(this.vVC1);
     }
  
     @Test
@@ -115,25 +115,25 @@ public class TestValeur {
     }
 
     @Test
-    public void test_ValeurVarchar_compareA_egal() throws TypesIncompatibleException {
-        assertThat(this.vVC2.compareA(this.vVC3), equalTo(0));
+    public void test_ValeurVarchar_compareTo_egal() throws TypesIncompatibleException {
+        assertThat(this.vVC2.compareTo(this.vVC3), equalTo(0));
     }
  
     @Test
-    public void test_ValeurVarchar_compareA_inferieur() throws TypesIncompatibleException {
+    public void test_ValeurVarchar_compareTo_inferieur() throws TypesIncompatibleException {
         // normalement "Apple" < "Banana" 
-        assertThat(this.vVC1.compareA(this.vVC2) < 0, equalTo(true));
+        assertThat(this.vVC1.compareTo(this.vVC2) < 0, equalTo(true));
     }
  
     @Test
-    public void test_ValeurVarchar_compareA_superieur() throws TypesIncompatibleException {
+    public void test_ValeurVarchar_compareTo_superieur() throws TypesIncompatibleException {
         // normalement "Banana" > "Apple" 
-        assertThat(this.vVC2.compareA(this.vVC1) > 0, equalTo(true));
+        assertThat(this.vVC2.compareTo(this.vVC1) > 0, equalTo(true));
     }
  
     @Test(expected = TypesIncompatibleException.class)
-    public void test_ValeurVarchar_compareA_typesIncompatibles() throws TypesIncompatibleException {
-        this.vVC1.compareA(this.vInt1);
+    public void test_ValeurVarchar_compareTo_typesIncompatibles() throws TypesIncompatibleException {
+        this.vVC1.compareTo(this.vInt1);
     }
 
     @Test

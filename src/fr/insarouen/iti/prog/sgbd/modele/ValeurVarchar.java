@@ -45,7 +45,7 @@ public class ValeurVarchar extends Valeur {
      *         lexicographiquement inférieure, égale ou supérieure à {@code autre}
      * @throws TypesIncompatibleException si {@code autre} n'est pas un {@link ValeurVarchar}
      */
-    public int compareA(Valeur autre) throws TypesIncompatibleException {
+    public int compareTo(Valeur autre) throws TypesIncompatibleException {
         if (!(autre instanceof ValeurVarchar)) {
             throw new TypesIncompatibleException(String.format("Le type attendu : VAECHAR, type reçu : %s", autre.getType() == Type.INT ? "INT" : "SERIAL" ));
         }

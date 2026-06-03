@@ -21,7 +21,7 @@ public abstract class Valeur implements Serializable{
     }
 
     public abstract Object getDonnee();
-    public abstract int compareA(Valeur autre) throws TypesIncompatibleException;
+    public abstract int compareTo(Valeur autre) throws TypesIncompatibleException;
     public abstract boolean estCompatible(Type t);
     
 }

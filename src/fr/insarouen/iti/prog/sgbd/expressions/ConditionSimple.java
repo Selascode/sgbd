@@ -25,7 +25,7 @@ public class ConditionSimple {
     public boolean evaluerCondition(Tuple t, Table table) throws AttributInconnuException,TypesIncompatibleException {
         Valeur valG = this.operandegauche.evaluer(t, table);
         Valeur valD = this.operandedroite.evaluer(t, table);
-        int cmp = valG.compareA(valD);
+        int cmp = valG.compareTo(valD);
         switch (this.op) {
             case EGAL:
                  return cmp == 0;

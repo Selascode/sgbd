@@ -45,7 +45,7 @@ public class ValeurInt extends Valeur {
      *         inférieure, égale ou supérieure à {@code autre}
      * @throws TypesIncompatibleException si {@code autre} n'est pas un {@link ValeurInt}
      */
-    public int compareA(Valeur autre) throws TypesIncompatibleException {
+    public int compareTo(Valeur autre) throws TypesIncompatibleException {
         if (!(autre instanceof ValeurInt)) {
             throw new TypesIncompatibleException(String.format("Le type attendu est INT, type reçu est %s", autre.getType() == Type.VARCHAR ? "VARCHAR" : "SERIAL" ));
         }
