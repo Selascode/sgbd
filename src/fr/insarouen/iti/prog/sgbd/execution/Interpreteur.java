@@ -6,128 +6,167 @@ import fr.insarouen.iti.prog.sgbd.parseur.TokenMgrError;
 import fr.insarouen.iti.prog.sgbd.data.EnregistreurSerialisation;
 import fr.insarouen.iti.prog.sgbd.data.GestionnaireStockage;
 import fr.insarouen.iti.prog.sgbd.data.LecteurSerialisation;
-import fr.insarouen.iti.prog.sgbd.exceptions.BaseDeDonneesExistanteException;
 import fr.insarouen.iti.prog.sgbd.modele.BaseDeDonnees;
 import java.io.FileInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.Scanner;
-public class Interpreteur{
-    private String name ;
 
-
-
+public class Interpreteur {
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        
-        // dossier où les bases sont sauvegardées
+
         String dossier = "saves/";
-        new File(dossier).mkdirs(); // crée le dossier si il n'existe pas
+        new File(dossier).mkdirs();
 
         GestionnaireStockage gestionnaire = new GestionnaireStockage(
             new LecteurSerialisation(),
             new EnregistreurSerialisation()
         );
 
-        BaseDeDonnees bd = null;
+        // Boucle principale : on revient ici apres chaque "menu"
+        while (true) {
+            BaseDeDonnees bd = null;
 
-        while (bd == null) {
-            // affiche les fichiers .ser existants dans le dossier saves/
-            afficherBasesExistantes(dossier);
+            while (bd == null) {
+                afficherMenu(dossier);
 
-            System.out.println("1 - Créer une nouvelle base");
-            System.out.println("2 - Charger une base existante");
-            System.out.println("3 - Afficher les bases existantes");
-            System.out.println("4 - Quitter"); 
-            System.out.print("Ton choix : ");
-            String choix = sc.nextLine().trim();
+                System.out.print("Ton choix : ");
+                String choix = sc.nextLine().trim();
 
-           if (choix.equals("1")) {
-                System.out.print("Nom de la nouvelle base : ");
-                String nom = sc.nextLine().trim();
-                String chemin = dossier + nom + ".ser";
+                if (choix.equals("1")) {
+                    System.out.print("Nom de la nouvelle base : ");
+                    String nom = sc.nextLine().trim();
+                    String chemin = dossier + nom + ".ser";
 
-                if (GestionnaireStockage.baseExiste(chemin)) {
-                        System.out.println("[ERREUR] Une base '" + nom + "' existe déjà sur le disque.");
+                    if (GestionnaireStockage.baseExiste(chemin)) {
+                        System.out.println("[ERREUR] Une base '" + nom + "' existe deja.");
+                        pause(sc);
                         continue;
                     }
-
                     try {
                         bd = new BaseDeDonnees(nom);
-                        gestionnaire.sauvegarder(bd, chemin); // ← ajouter ici
-                        System.out.println("Base '" + nom + "' créée.");
+                        gestionnaire.sauvegarder(bd, chemin);
+                        System.out.println("Base '" + nom + "' creee.");
                     } catch (Exception e) {
                         System.out.println("[ERREUR] " + e.getMessage());
-                    
-                }
-            
-                } else if (choix.equals("3")) {
-                    // affiche et recommence la boucle
-                    afficherBasesExistantes(dossier);
-
-                }else if (choix.equals("4") || choix.equalsIgnoreCase("quit") || choix.equalsIgnoreCase("exit")) {
-            
-                    System.out.println("Au revoir ;)");
-                    return;  // quitte le main
+                        pause(sc);
+                    }
 
                 } else if (choix.equals("2")) {
+                    System.out.print("Nom de la base a charger : ");
+                    String nom = sc.nextLine().trim();
+                    String chemin = dossier + nom + ".ser";
 
-                System.out.print("Nom de la base à charger : ");
-                String nom = sc.nextLine().trim();
-                String chemin = dossier + nom + ".ser";
+                    if (!GestionnaireStockage.baseExiste(chemin)) {
+                        System.out.println("[ERREUR] Aucune base '" + nom + "' trouvee.");
+                        pause(sc);
+                        continue;
+                    }
+                    try {
+                        bd = gestionnaire.charger(chemin);
+                        System.out.println("Base '" + nom + "' chargee.");
+                    } catch (Exception e) {
+                        System.out.println("[ERREUR] " + e.getMessage());
+                        pause(sc);
+                    }
 
-                if (!GestionnaireStockage.baseExiste(chemin)) {
-                    System.out.println("[ERREUR] Aucune base '" + nom + "' trouvée.");
-                    continue;
-                }
+                } else if (choix.equals("3")) {
+                    afficherBasesExistantes(dossier);
+                    pause(sc);
 
-                try {
-                    bd = gestionnaire.charger(chemin);
-                    System.out.println("Base '" + nom + "' chargée.");
-                } catch (Exception e) {
-                    System.out.println("[ERREUR] " + e.getMessage());
+                } else if (choix.equals("4")) {
+                    System.out.println("Au revoir ;)");
+                    System.exit(0);
                 }
             }
-        }
 
-      if (args.length == 0) {
-            interpreteurConsole(bd, gestionnaire, dossier + bd.getNom() + ".ser", sc);
-        } else {
-            interpreteurFichier(args[0], bd, gestionnaire, dossier + bd.getNom() + ".ser");
-            interpreteurConsole(bd, gestionnaire, dossier + bd.getNom() + ".ser", sc);
+            // On a une base - on lance l'interpreteur
+            if (args.length == 0) {
+                interpreteurConsole(bd, gestionnaire, dossier + bd.getNom() + ".ser", sc);
+            } else {
+                interpreteurFichier(args[0], bd, gestionnaire, dossier + bd.getNom() + ".ser");
+                interpreteurConsole(bd, gestionnaire, dossier + bd.getNom() + ".ser", sc);
+            }
+            // interpreteurConsole a retourne -> "menu" tape -> on reboucle
         }
     }
 
-    
+    // -------------------------------------------------------------------------
+
+    private static void afficherMenu(String dossier) {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+
+        System.out.println();
+        System.out.println("          +----------------------------------+");
+        System.out.println("          |         MINI-SGBD - ACCUEIL      |");
+        System.out.println("          +----------------------------------+");
+
+        File[] fichiers = new File(dossier).listFiles(f -> f.getName().endsWith(".ser"));
+        if (fichiers != null && fichiers.length > 0) {
+            System.out.println("          |  Bases disponibles :             |");
+            for (File f : fichiers) {
+                String nom = f.getName().replace(".ser", "");
+                System.out.printf("          |    - %-28s|%n", nom);
+            }
+            System.out.println("          +----------------------------------+");
+        }
+
+        System.out.println("          |  1 - Creer une nouvelle base     |");
+        System.out.println("          |  2 - Charger une base existante  |");
+        System.out.println("          |  3 - Afficher les bases          |");
+        System.out.println("          |  4 - Quitter                     |");
+        System.out.println("          +----------------------------------+");
+        System.out.println();
+    }
+
     private static void afficherBasesExistantes(String dossier) {
         File[] fichiers = new File(dossier).listFiles(f -> f.getName().endsWith(".ser"));
+        System.out.println();
+        System.out.println("          +----------------------------------+");
+        System.out.println("          |        BASES EXISTANTES          |");
+        System.out.println("          +----------------------------------+");
         if (fichiers == null || fichiers.length == 0) {
-            System.out.println("Aucune base sauvegardée.");
-            return;
+            System.out.println("          |  (aucune base sauvegardee)       |");
+        } else {
+            for (File f : fichiers) {
+                String nom = f.getName().replace(".ser", "");
+                System.out.printf("          |    - %-28s|%n", nom);
+            }
         }
-        System.out.println("Bases existantes :");
-        for (File f : fichiers) {
-            System.out.println("  - " + f.getName().replace(".ser", ""));
-        }
+        System.out.println("          +----------------------------------+");
     }
 
+    private static void pause(Scanner sc) {
+        System.out.print("\nAppuyez sur Entree pour continuer...");
+        sc.nextLine();
+    }
+
+    // -------------------------------------------------------------------------
 
     public static void interpreteurConsole(BaseDeDonnees db, GestionnaireStockage gestionnaire, String chemin, Scanner sc) {
-        
-        String commande = "";
+        System.out.println("\nBase '" + db.getNom() + "' active. Tapez 'menu' pour revenir au menu.\n");
         System.out.print("sgbd> ");
 
+        String commande = "";
         try {
             while (true) {
                 String ligne = sc.nextLine();
                 commande += ligne;
 
                 String commandeLower = commande.trim().toLowerCase();
+
+                if (commandeLower.equals("menu") || commandeLower.equals("menu;")) {
+                    System.out.println("Retour au menu principal...\n");
+                    return;
+                }
+
                 if (commandeLower.equals("quit") || commandeLower.equals("exit") ||
                     commandeLower.equals("quit;") || commandeLower.equals("exit;")) {
                     System.out.println("Au revoir ;)");
-                    return;
+                    System.exit(0);
                 }
 
                 if (commande.trim().endsWith(";")) {
@@ -144,9 +183,11 @@ public class Interpreteur{
                     } catch (ParseException e) {
                         System.out.println("[ERREUR] Syntaxe incorrecte : " + e.getMessage());
                     } catch (TokenMgrError e) {
-                        System.out.println("[ERREUR] Caractère inconnu : " + e.getMessage());
+                        System.out.println("[ERREUR] Caractere inconnu : " + e.getMessage());
+                    } catch (RuntimeException e) {
+                        System.out.println("[ERREUR] " + e.getMessage());
                     } catch (Exception e) {
-                        System.out.println("[ERREUR] Sauvegarde : " + e.getMessage());
+                        System.out.println("[ERREUR FATALE] " + e.getMessage());
                     }
 
                     commande = "";
@@ -154,17 +195,16 @@ public class Interpreteur{
                 }
             }
         } catch (java.util.NoSuchElementException e) {
-            // stdin fermé (Ctrl+D), on sort proprement
             System.out.println("\nAu revoir ;)");
         }
     }
-    
+
     public static void interpreteurFichier(String cheminFichier, BaseDeDonnees db, GestionnaireStockage gestionnaire, String chemin) {
         try {
             FileInputStream fis = new FileInputStream(cheminFichier);
             SGBDParser parser = new SGBDParser(fis);
             parser.setDatabase(db);
-            System.out.println("Analyse du fichier: " + cheminFichier);
+            System.out.println("Analyse du fichier : " + cheminFichier);
 
             while (true) {
                 try {
@@ -178,16 +218,10 @@ public class Interpreteur{
                     break;
                 }
             }
-
         } catch (java.io.FileNotFoundException e) {
             System.out.println("[ERREUR] Fichier introuvable : " + cheminFichier);
         } catch (Exception e) {
             System.out.println("[ERREUR] Lecture : " + e.getMessage());
         }
-        // pas de sauvegarde ici — c'est interpreteurConsole qui gère ça
     }
-    
-
-
 }
-
