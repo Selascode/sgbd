@@ -371,8 +371,6 @@ void CommandeInsert() :
       // APRÈS
     } catch (TableInconnueException e) {
       System.err.println("[ERREUR] " + e.getMessage());
-    } catch (TypesIncompatibleException e) {
-      System.err.println("[ERREUR] Type incompatible : " + e.getMessage());
     }
     
   }
